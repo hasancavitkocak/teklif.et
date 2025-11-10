@@ -32,6 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
     console.log('Profile fetched:', data);
+    console.log('is_admin value:', data?.is_admin);
+    console.log('is_admin type:', typeof data?.is_admin);
     return data;
   };
 

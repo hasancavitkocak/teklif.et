@@ -8,11 +8,13 @@ import {
   Settings, 
   Menu, 
   X,
-  LogOut
+  LogOut,
+  Mail,
+  Crown
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-type AdminPage = 'dashboard' | 'users' | 'offers' | 'matches' | 'reports' | 'settings';
+type AdminPage = 'dashboard' | 'users' | 'offers' | 'matches' | 'reports' | 'contact' | 'premium' | 'settings';
 
 type Props = {
   children: ReactNode;
@@ -30,6 +32,8 @@ export default function AdminLayout({ children, currentPage, onNavigate }: Props
     { id: 'offers' as AdminPage, icon: FileText, label: 'Talepler', color: 'text-purple-500' },
     { id: 'matches' as AdminPage, icon: Heart, label: 'Eşleşmeler', color: 'text-pink-500' },
     { id: 'reports' as AdminPage, icon: Flag, label: 'Raporlar', color: 'text-orange-500' },
+    { id: 'contact' as AdminPage, icon: Mail, label: 'İletişim', color: 'text-cyan-500' },
+    { id: 'premium' as AdminPage, icon: Crown, label: 'Premium', color: 'text-yellow-500' },
     { id: 'settings' as AdminPage, icon: Settings, label: 'Ayarlar', color: 'text-gray-500' },
   ];
 

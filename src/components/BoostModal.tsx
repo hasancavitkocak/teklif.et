@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Zap, Heart, Sparkles, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useAppSettings } from '../hooks/useAppSettings';
 
 type BoostModalProps = {
   onClose: () => void;
@@ -10,18 +11,22 @@ type BoostModalProps = {
 
 export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
   const { profile, refreshProfile } = useAuth();
+  const { settings } = useAppSettings();
   const [processing, setProcessing] = useState(false);
   const [selectedBoost, setSelectedBoost] = useState<'profile' | 'super_like' | null>(null);
+
+  const boostPrice = settings?.boost_price?.amount || 500;
+  const boostDuration = settings?.boost_duration?.hours || 1;
 
   const boosts = {
     profile: {
       title: 'Profil Boost',
       icon: Zap,
-      duration: '30 dakika',
+      duration: `${boostDuration} saat`,
       benefit: '3x daha fazla görünürlük',
-      price: 49.90,
+      price: boostPrice / 100, // Convert to TRY
       color: 'from-purple-500 to-pink-500',
-      description: 'Profilin 30 dakika boyunca en üstte görünür',
+      description: `Profilin ${boostDuration} saat boyunca en üstte görünür`,
     },
     super_like: {
       title: 'Super Like',
@@ -42,7 +47,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
     try {
       if (selectedBoost === 'profile') {
         // Activate profile boost
-        const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+        const expiresAt = new Date(Date.now() + boostDuration * 60 * 60 * 1000); // Dynamic hours
 
         const { error: boostError } = await supabase
           .from('boosts')

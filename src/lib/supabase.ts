@@ -15,7 +15,7 @@ export type Profile = {
   bio?: string;
   interests?: string[];
   is_premium: boolean;
-  is_admin?: boolean;
+  is_admin: boolean;
   daily_offers_count: number;
   last_offer_reset: string;
   free_offers_used: number;

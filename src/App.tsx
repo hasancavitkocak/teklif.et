@@ -14,25 +14,43 @@ import Profile from './components/Profile';
 import FAQ from './components/legal/FAQ';
 import Help from './components/legal/Help';
 import Report from './components/legal/Report';
+import Contact from './components/legal/Contact';
 import PrivacyPolicy from './components/legal/PrivacyPolicy';
 import TermsOfService from './components/legal/TermsOfService';
 import KVKK from './components/legal/KVKK';
 import CookiePolicy from './components/legal/CookiePolicy';
 import AdminApp from './admin/AdminApp';
 
-type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies' | 'admin';
+type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'contact' | 'privacy' | 'terms' | 'kvkk' | 'cookies' | 'admin';
 
 function AppContent() {
   const { user, loading } = useAuth();
   useNotifications(); // Initialize real-time notifications
   useCapacitor(); // Initialize Capacitor
   usePushNotifications(); // Initialize push notifications
-  const [currentPage, setCurrentPage] = useState<Page>('discover');
+  
+  // Check URL for admin route
+  const isAdminRoute = window.location.pathname === '/admin';
+  const [currentPage, setCurrentPage] = useState<Page>(isAdminRoute ? 'admin' : 'discover');
 
   // Scroll to top when page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
+
+  // Handle URL changes
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname === '/admin') {
+        setCurrentPage('admin');
+      } else {
+        setCurrentPage('discover');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   if (loading) {
     return (
@@ -49,6 +67,12 @@ function AppContent() {
     return <Auth />;
   }
 
+  // Navigate to admin
+  const navigateToAdmin = () => {
+    window.history.pushState({}, '', '/admin');
+    setCurrentPage('admin');
+  };
+
   // Admin panel check
   if (currentPage === 'admin') {
     return <AdminApp />;
@@ -64,6 +88,7 @@ function AppContent() {
       {currentPage === 'faq' && <FAQ />}
       {currentPage === 'help' && <Help />}
       {currentPage === 'report' && <Report />}
+      {currentPage === 'contact' && <Contact />}
       {currentPage === 'privacy' && <PrivacyPolicy />}
       {currentPage === 'terms' && <TermsOfService />}
       {currentPage === 'kvkk' && <KVKK />}

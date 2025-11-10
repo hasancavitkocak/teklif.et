@@ -23,7 +23,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showCreateOffer, setShowCreateOffer] = useState(false);
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [filters, setFilters] = useState({
-    city: '',
+    city: 'my_city' as 'my_city' | 'all' | string,
     category: 'all' as string,
     offerType: 'all' as 'all' | 'birebir' | 'grup',
   });
@@ -85,12 +85,15 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         .gte('event_date', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      // Varsayılan olarak kullanıcının şehrindeki talepleri göster
-      // Eğer filtre uygulanmışsa, filtreyi kullan
-      const cityFilter = filters.city || profile.city;
-      if (cityFilter) {
-        query = query.ilike('city', `%${cityFilter}%`);
+      // Şehir filtresi
+      if (filters.city === 'my_city') {
+        // Kullanıcının şehrini göster
+        query = query.ilike('city', `%${profile.city}%`);
+      } else if (filters.city !== 'all' && filters.city !== '') {
+        // Özel şehir filtresi
+        query = query.ilike('city', `%${filters.city}%`);
       }
+      // 'all' seçiliyse hiçbir şehir filtresi uygulanmaz
 
       if (filters.category !== 'all') {
         query = query.eq('category', filters.category);
@@ -278,14 +281,31 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         <div className="mb-6 bg-white rounded-2xl shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Şehir</label>
-              <input
-                type="text"
-                value={filters.city}
-                onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                placeholder="Şehir ara..."
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Konum</label>
+              <select
+                value={filters.city === 'my_city' || filters.city === 'all' ? filters.city : 'custom'}
+                onChange={(e) => {
+                  if (e.target.value === 'my_city' || e.target.value === 'all') {
+                    setFilters({ ...filters, city: e.target.value });
+                  } else {
+                    setFilters({ ...filters, city: '' });
+                  }
+                }}
                 className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none"
-              />
+              >
+                <option value="my_city">Şehrim ({profile?.city})</option>
+                <option value="all">Tüm Türkiye</option>
+                <option value="custom">Özel Şehir</option>
+              </select>
+              {filters.city !== 'my_city' && filters.city !== 'all' && (
+                <input
+                  type="text"
+                  value={filters.city}
+                  onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+                  placeholder="Şehir adı girin..."
+                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none mt-2"
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>

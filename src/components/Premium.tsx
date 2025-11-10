@@ -1,35 +1,41 @@
 import { useState } from 'react';
-import { Crown, Heart, Eye, Zap, Check, Sparkles } from 'lucide-react';
+import { Crown, Heart, Eye, Zap, Check, Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { useAppSettings } from '../hooks/useAppSettings';
 
-type PackageType = 'package_10' | 'package_20' | 'monthly_unlimited';
+type PackageType = 'weekly_10' | 'weekly_20' | 'monthly_unlimited';
 
 export default function Premium() {
   const { profile, refreshProfile } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState<PackageType>('package_10');
+  const { settings, loading: settingsLoading } = useAppSettings();
+  const [selectedPlan, setSelectedPlan] = useState<PackageType>('weekly_20');
   const [processing, setProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
+  const weekly10Price = settings?.premium_weekly_10_price?.amount || 500;
+  const weekly20Price = settings?.premium_weekly_20_price?.amount || 800;
+  const monthlyPrice = settings?.premium_monthly_price?.amount || 3000;
+
   const plans = {
-    package_10: {
-      price: 500,
-      name: '10 Teklif Paketi',
+    weekly_10: {
+      price: weekly10Price,
+      name: 'Haftalık 10 Teklif',
       offers: 10,
-      duration: 'Süresiz',
+      duration: '7 gün',
       savings: null,
       popular: false,
     },
-    package_20: {
-      price: 800,
-      name: '20 Teklif Paketi',
+    weekly_20: {
+      price: weekly20Price,
+      name: 'Haftalık 20 Teklif',
       offers: 20,
-      duration: 'Süresiz',
-      savings: '200₺ tasarruf',
+      duration: '7 gün',
+      savings: `${weekly10Price * 2 - weekly20Price}₺ tasarruf`,
       popular: true,
     },
     monthly_unlimited: {
-      price: 3000,
+      price: monthlyPrice,
       name: 'Aylık Sınırsız',
       offers: null,
       duration: '30 gün',
@@ -37,6 +43,14 @@ export default function Premium() {
       popular: false,
     },
   };
+
+  if (settingsLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+      </div>
+    );
+  }
 
   const features = [
     {
@@ -99,15 +113,22 @@ export default function Premium() {
       const plan = plans[selectedPlan];
       
       // Create package record
-      const expiresAt = plan.offers === null 
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days for unlimited
-        : null; // No expiry for counted packages
+      let expiresAt: string | null = null;
+      let packageType = 'gunluk';
+
+      if (selectedPlan === 'monthly_unlimited') {
+        expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+        packageType = 'aylik';
+      } else if (selectedPlan === 'weekly_10' || selectedPlan === 'weekly_20') {
+        expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
+        packageType = 'gunluk';
+      }
 
       const { error } = await supabase
         .from('packages')
         .insert({
           user_id: profile.id,
-          package_type: selectedPlan === 'monthly_unlimited' ? 'aylik' : 'gunluk',
+          package_type: packageType,
           offer_limit: plan.offers,
           expires_at: expiresAt,
           is_active: true,
