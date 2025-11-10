@@ -21,11 +21,15 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showCreateOffer, setShowCreateOffer] = useState(false);
+  const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [filters, setFilters] = useState({
     city: '',
     category: 'all' as string,
     offerType: 'all' as 'all' | 'birebir' | 'grup',
   });
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullStart, setPullStart] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
 
   useEffect(() => {
     if (profile) {
@@ -33,12 +37,45 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     }
   }, [profile?.id]); // Only re-fetch when profile ID changes
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchOffers();
+    setTimeout(() => setRefreshing(false), 500);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      setPullStart(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (pullStart > 0 && window.scrollY === 0) {
+      const distance = e.touches[0].clientY - pullStart;
+      if (distance > 0 && distance < 150) {
+        setPullDistance(distance);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 80) {
+      handleRefresh();
+    }
+    setPullStart(0);
+    setPullDistance(0);
+  };
+
   const fetchOffers = async () => {
     if (!profile) return;
 
     try {
       // First, expire past offers
-      await supabase.rpc('expire_past_offers').catch(() => {});
+      try {
+        await supabase.rpc('expire_past_offers');
+      } catch (e) {
+        // Ignore errors from expire function
+      }
 
       let query = supabase
         .from('activity_offers')
@@ -163,7 +200,43 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-24">
+    <div 
+      className="max-w-4xl mx-auto pb-24"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull to Refresh Indicator */}
+      {pullDistance > 0 && (
+        <div 
+          className="fixed top-0 left-0 right-0 flex justify-center items-center z-50 transition-all"
+          style={{ 
+            height: `${pullDistance}px`,
+            opacity: Math.min(pullDistance / 80, 1)
+          }}
+        >
+          <div className="bg-white rounded-full p-3 shadow-lg">
+            <div 
+              className={`w-6 h-6 border-3 border-pink-500 border-t-transparent rounded-full ${
+                refreshing ? 'animate-spin' : ''
+              }`}
+              style={{
+                transform: `rotate(${pullDistance * 3}deg)`
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {refreshing && (
+        <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
+          <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium text-gray-700">Yenileniyor...</span>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-2xl font-bold text-gray-800">Keşfet</h2>
@@ -371,6 +444,44 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         </div>
       )}
 
+      {/* Offer Created Success Popup */}
+      {showOfferCreatedPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <CheckCircle className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                Talep Oluşturuldu! 🎉
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Talebiniz artık "Keşfet" sayfasında görünüyor. Diğer kullanıcılar size teklif gönderebilir.
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowOfferCreatedPopup(false);
+                    onNavigate?.('offers');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  Taleplerime Git
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setShowOfferCreatedPopup(false)}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  Keşfetmeye Devam Et
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Popup Modal */}
       {showSuccessPopup && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -447,10 +558,17 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 </button>
               </div>
               <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-                <CreateOfferWizard onNavigate={(page) => {
-                  setShowCreateOffer(false);
-                  onNavigate?.(page);
-                }} />
+                <CreateOfferWizard 
+                  onSuccess={() => {
+                    setShowCreateOffer(false);
+                    setShowOfferCreatedPopup(true); // Show offer created popup
+                    fetchOffers(); // Refresh offers list
+                  }}
+                  onNavigate={(page) => {
+                    setShowCreateOffer(false);
+                    onNavigate?.(page);
+                  }} 
+                />
               </div>
             </div>
           </div>

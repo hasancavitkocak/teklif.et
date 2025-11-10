@@ -25,17 +25,28 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
   }, [profile?.id]); // Only re-fetch when profile ID changes
 
   const fetchMyOffers = async () => {
-    if (!profile) return;
+    if (!profile) {
+      console.log('MyOffers: No profile found');
+      return;
+    }
+
+    console.log('MyOffers: Fetching offers for profile:', profile.id);
 
     try {
       // Expire past offers first
-      await supabase.rpc('expire_past_offers').catch(() => {});
+      try {
+        await supabase.rpc('expire_past_offers');
+      } catch (e) {
+        // Ignore errors from expire function
+      }
 
       const { data, error } = await supabase
         .from('activity_offers')
         .select('*')
         .eq('creator_id', profile.id)
         .order('created_at', { ascending: false });
+
+      console.log('MyOffers: Query result:', { data, error, count: data?.length });
 
       if (error) throw error;
 

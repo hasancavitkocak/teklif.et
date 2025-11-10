@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import MyOffers from './MyOffers';
 import IncomingRequests from './IncomingRequests';
 import SentOffers from './SentOffers';
+import Chat from './Chat';
 
 export default function Offers() {
   const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState<'my-offers' | 'requests' | 'sent-offers'>('my-offers');
   const [pendingCount, setPendingCount] = useState(0);
+  const [chatUser, setChatUser] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -93,9 +95,15 @@ export default function Offers() {
       </div>
 
       {/* Content */}
-      {activeTab === 'my-offers' && <MyOffers onViewRequests={handleViewRequests} />}
-      {activeTab === 'requests' && <IncomingRequests onRequestHandled={fetchPendingCount} />}
-      {activeTab === 'sent-offers' && <SentOffers />}
+      {chatUser ? (
+        <Chat matchedUser={chatUser} onBack={() => setChatUser(null)} />
+      ) : (
+        <>
+          {activeTab === 'my-offers' && <MyOffers onViewRequests={handleViewRequests} />}
+          {activeTab === 'requests' && <IncomingRequests onRequestHandled={fetchPendingCount} onOpenChat={setChatUser} />}
+          {activeTab === 'sent-offers' && <SentOffers />}
+        </>
+      )}
     </div>
   );
 }

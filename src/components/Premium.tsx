@@ -126,6 +126,27 @@ export default function Premium() {
     }
   };
 
+  const cancelPremium = async () => {
+    if (!confirm('Premium üyeliğinizi iptal etmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_premium: false })
+        .eq('id', profile?.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      alert('Premium üyeliğiniz iptal edildi.');
+    } catch (error) {
+      console.error('Error canceling premium:', error);
+      alert('İptal işlemi başarısız oldu.');
+    }
+  };
+
   if (profile?.is_premium) {
     return (
       <div className="max-w-md mx-auto pb-24">
@@ -135,7 +156,7 @@ export default function Premium() {
           <p className="text-amber-50 mb-6">
             Tüm premium özelliklerin keyfini çıkarın
           </p>
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-6">
             <h3 className="font-semibold mb-4">Aktif Özellikleriniz</h3>
             <div className="space-y-3">
               {features.map((feature, index) => (
@@ -146,6 +167,13 @@ export default function Premium() {
               ))}
             </div>
           </div>
+          
+          <button
+            onClick={cancelPremium}
+            className="w-full py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl font-medium transition-all"
+          >
+            Premium Üyeliği İptal Et
+          </button>
         </div>
       </div>
     );

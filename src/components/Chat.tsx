@@ -295,6 +295,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
               style={{ borderColor: '#ff99cc' }}
               disabled={sending}
               autoComplete="off"
+              inputMode="text"
             />
             <button
               type="submit"

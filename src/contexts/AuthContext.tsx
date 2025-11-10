@@ -86,15 +86,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
     if (profileError) throw profileError;
+
+    // Immediately fetch and set the profile to avoid delay
+    const newProfile = await fetchProfile(data.user.id);
+    if (newProfile) {
+      setProfile(newProfile);
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) throw error;
+
+    // Immediately fetch and set the profile to avoid delay
+    if (data.user) {
+      const userProfile = await fetchProfile(data.user.id);
+      if (userProfile) {
+        setProfile(userProfile);
+      }
+    }
   };
 
   const signOut = async () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Calendar, MapPin, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Calendar, MapPin, Users } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,13 +15,13 @@ const categories = [
 
 type Props = {
   onNavigate: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile') => void;
+  onSuccess?: () => void;
 };
 
-export default function CreateOfferWizard({ onNavigate }: Props) {
+export default function CreateOfferWizard({ onSuccess }: Props) {
   const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   
   const [formData, setFormData] = useState({
     category: '' as ActivityOffer['category'] | '',
@@ -50,37 +50,51 @@ export default function CreateOfferWizard({ onNavigate }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!profile || !formData.category) return;
+    if (!profile || !formData.category) {
+      console.error('Missing profile or category:', { profile: !!profile, category: formData.category });
+      alert('Lütfen tüm gerekli alanları doldurun');
+      return;
+    }
 
     setLoading(true);
 
     try {
+      console.log('Creating offer with data:', formData);
       const eventDateTime = new Date(`${formData.event_date}T${formData.event_time}`);
+      console.log('Event date time:', eventDateTime.toISOString());
       
-      const { error: insertError } = await supabase
+      const offerData = {
+        creator_id: profile.id,
+        title: formData.title,
+        description: formData.description,
+        city: formData.city,
+        district: formData.district || null,
+        event_date: eventDateTime.toISOString(),
+        participant_count: formData.participant_count,
+        offer_type: formData.offer_type,
+        category: formData.category,
+        image_url: null,
+        status: 'active' as const,
+      };
+
+      console.log('Inserting offer:', offerData);
+
+      const { data, error: insertError } = await supabase
         .from('activity_offers')
-        .insert({
-          creator_id: profile.id,
-          title: formData.title,
-          description: formData.description,
-          city: formData.city,
-          district: formData.district || null,
-          event_date: eventDateTime.toISOString(),
-          participant_count: formData.participant_count,
-          offer_type: formData.offer_type,
-          category: formData.category,
-          image_url: null,
-          status: 'active',
-        })
+        .insert(offerData)
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        throw insertError;
+      }
 
-      setSuccess(true);
+      console.log('Offer created successfully:', data);
+      onSuccess?.(); // Call onSuccess callback to refresh parent
     } catch (err: any) {
       console.error('Error creating offer:', err);
-      alert('Teklif oluşturulurken bir hata oluştu');
+      alert(`Teklif oluşturulurken bir hata oluştu: ${err.message || 'Bilinmeyen hata'}`);
     } finally {
       setLoading(false);
     }
@@ -101,41 +115,7 @@ export default function CreateOfferWizard({ onNavigate }: Props) {
     }
   };
 
-  if (success) {
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <Check className="w-12 h-12 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              Talep Oluşturuldu! 🎉
-            </h3>
-            <p className="text-gray-600 mb-8">
-              Talebiniz artık "Keşfet" sayfasında görünüyor.
-            </p>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => onNavigate('discover')}
-                className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-5 h-5" />
-                Keşfet Sayfasına Git
-              </button>
-              <button
-                onClick={() => onNavigate('offers')}
-                className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-              >
-                Taleplerime Git
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Success is handled by parent component via onSuccess callback
 
   return (
     <div className="max-w-2xl mx-auto">

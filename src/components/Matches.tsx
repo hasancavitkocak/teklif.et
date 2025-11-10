@@ -59,8 +59,23 @@ export default function Matches() {
         }))
       ];
 
+      // Remove duplicates - keep only one match per user
+      const uniqueMatches = allMatches.reduce((acc: typeof allMatches, match) => {
+        const existingMatch = acc.find((m: typeof match) => m.matchedUser.id === match.matchedUser.id);
+        if (!existingMatch) {
+          acc.push(match);
+        } else {
+          // Keep the newer match
+          if (new Date(match.created_at) > new Date(existingMatch.created_at)) {
+            const index = acc.indexOf(existingMatch);
+            acc[index] = match;
+          }
+        }
+        return acc;
+      }, []);
+
       // Get last message and unread count for each match
-      for (const match of allMatches) {
+      for (const match of uniqueMatches) {
         const { data: lastMessage } = await supabase
           .from('messages')
           .select('content, created_at, sender_id')
@@ -83,13 +98,13 @@ export default function Matches() {
       }
 
       // Sort by last message time or match time
-      allMatches.sort((a, b) => {
+      uniqueMatches.sort((a: typeof uniqueMatches[0], b: typeof uniqueMatches[0]) => {
         const aTime = a.lastMessage?.created_at || a.created_at;
         const bTime = b.lastMessage?.created_at || b.created_at;
         return new Date(bTime).getTime() - new Date(aTime).getTime();
       });
 
-      setMatches(allMatches);
+      setMatches(uniqueMatches);
     } catch (error) {
       console.error('Error fetching matches:', error);
     } finally {
@@ -112,7 +127,17 @@ export default function Matches() {
     if (!profile) return;
 
     try {
-      // Delete the match
+      // First, delete related offer_requests
+      const { error: requestError } = await supabase
+        .from('offer_requests')
+        .delete()
+        .or(`offer_id.eq.${matchId},requester_id.eq.${profile.id}`);
+
+      if (requestError) {
+        console.error('Error deleting offer requests:', requestError);
+      }
+
+      // Then delete the match/offer
       const { error } = await supabase
         .from('offers')
         .delete()

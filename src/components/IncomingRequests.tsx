@@ -6,9 +6,10 @@ import ProfileView from './ProfileView';
 
 type IncomingRequestsProps = {
   onRequestHandled?: () => void;
+  onOpenChat?: (user: Profile) => void;
 };
 
-export default function IncomingRequests({ onRequestHandled }: IncomingRequestsProps) {
+export default function IncomingRequests({ onRequestHandled, onOpenChat }: IncomingRequestsProps) {
   const { profile } = useAuth();
   const [requests, setRequests] = useState<(OfferRequest & { requester: Profile })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -289,7 +290,7 @@ export default function IncomingRequests({ onRequestHandled }: IncomingRequestsP
                       Artık mesajlaşabilirsiniz.
                     </p>
                     <button 
-                      onClick={() => setSelectedProfile(request.requester)}
+                      onClick={() => onOpenChat?.(request.requester)}
                       className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                     >
                       <MessageCircle className="w-5 h-5" />
