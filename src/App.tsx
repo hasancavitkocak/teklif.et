@@ -18,8 +18,9 @@ import PrivacyPolicy from './components/legal/PrivacyPolicy';
 import TermsOfService from './components/legal/TermsOfService';
 import KVKK from './components/legal/KVKK';
 import CookiePolicy from './components/legal/CookiePolicy';
+import AdminApp from './admin/AdminApp';
 
-type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies';
+type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies' | 'admin';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -46,6 +47,11 @@ function AppContent() {
 
   if (!user) {
     return <Auth />;
+  }
+
+  // Admin panel check
+  if (currentPage === 'admin') {
+    return <AdminApp />;
   }
 
   return (
