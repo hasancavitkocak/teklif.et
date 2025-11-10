@@ -135,3 +135,15 @@ input[type="range"].slider:focus::-webkit-slider-thumb {
 input[type="range"].slider:focus::-moz-range-thumb {
   box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
 }
+
+
+/* Pull to refresh styles */
+.pull-to-refresh-container {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent default pull-to-refresh on mobile browsers */
+body {
+  overscroll-behavior-y: contain;
+}

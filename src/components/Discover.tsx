@@ -17,6 +17,9 @@ export default function Discover() {
     gender: 'all' as 'all' | 'erkek' | 'kadın',
     maxDistance: 100
   });
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullStart, setPullStart] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
 
   // Calculate distance between two coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -207,6 +210,36 @@ export default function Discover() {
     setCurrentIndex(currentIndex + 1);
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    setCurrentIndex(0);
+    await fetchProfiles();
+    setTimeout(() => setRefreshing(false), 500);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      setPullStart(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (pullStart > 0 && window.scrollY === 0) {
+      const distance = e.touches[0].clientY - pullStart;
+      if (distance > 0 && distance < 150) {
+        setPullDistance(distance);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 80) {
+      handleRefresh();
+    }
+    setPullStart(0);
+    setPullDistance(0);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -246,7 +279,43 @@ export default function Discover() {
   const currentCard = profiles[currentIndex];
 
   return (
-    <div className="max-w-md mx-auto pb-24">
+    <div 
+      className="max-w-md mx-auto pb-24"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull to Refresh Indicator */}
+      {pullDistance > 0 && (
+        <div 
+          className="fixed top-0 left-0 right-0 flex justify-center items-center z-50 transition-all"
+          style={{ 
+            height: `${pullDistance}px`,
+            opacity: Math.min(pullDistance / 80, 1)
+          }}
+        >
+          <div className="bg-white rounded-full p-3 shadow-lg">
+            <div 
+              className={`w-6 h-6 border-3 border-pink-500 border-t-transparent rounded-full ${
+                refreshing ? 'animate-spin' : ''
+              }`}
+              style={{
+                transform: `rotate(${pullDistance * 3}deg)`
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {refreshing && (
+        <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
+          <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium text-gray-700">Yenileniyor...</span>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-800">Keşfet</h2>
