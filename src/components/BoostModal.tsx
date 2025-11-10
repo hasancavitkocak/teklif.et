@@ -1,0 +1,221 @@
+import { useState } from 'react';
+import { X, Zap, Heart, Sparkles, Clock } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+
+type BoostModalProps = {
+  onClose: () => void;
+  onSuccess: () => void;
+};
+
+export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
+  const { profile, refreshProfile } = useAuth();
+  const [processing, setProcessing] = useState(false);
+  const [selectedBoost, setSelectedBoost] = useState<'profile' | 'super_like' | null>(null);
+
+  const boosts = {
+    profile: {
+      title: 'Profil Boost',
+      icon: Zap,
+      duration: '30 dakika',
+      benefit: '3x daha fazla görünürlük',
+      price: 49.90,
+      color: 'from-purple-500 to-pink-500',
+      description: 'Profilin 30 dakika boyunca en üstte görünür',
+    },
+    super_like: {
+      title: 'Super Like',
+      icon: Heart,
+      duration: 'Tek kullanım',
+      benefit: 'Özel bildirim gönder',
+      price: 19.90,
+      color: 'from-pink-500 to-rose-500',
+      description: 'Karşı tarafa özel bildirimle öne çık',
+    },
+  };
+
+  const handlePurchase = async () => {
+    if (!profile || !selectedBoost) return;
+
+    setProcessing(true);
+
+    try {
+      if (selectedBoost === 'profile') {
+        // Activate profile boost
+        const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+        const { error: boostError } = await supabase
+          .from('boosts')
+          .insert({
+            user_id: profile.id,
+            boost_type: 'profile_boost',
+            expires_at: expiresAt.toISOString(),
+            is_active: true,
+          });
+
+        if (boostError) throw boostError;
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            is_boosted: true,
+            boost_expires_at: expiresAt.toISOString(),
+          })
+          .eq('id', profile.id);
+
+        if (profileError) throw profileError;
+
+        alert('🚀 Profil Boost aktif! 30 dakika boyunca 3x daha fazla görünürlük!');
+      } else if (selectedBoost === 'super_like') {
+        // Add super like
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            super_likes_remaining: (profile.super_likes_remaining || 0) + 1,
+          })
+          .eq('id', profile.id);
+
+        if (error) throw error;
+
+        alert('💖 Super Like eklendi! Özel teklifler gönderebilirsin!');
+      }
+
+      await refreshProfile();
+      onSuccess();
+      onClose();
+    } catch (error: any) {
+      console.error('Boost error:', error);
+      alert('Bir hata oluştu: ' + error.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-8 h-8" />
+            <div>
+              <h3 className="text-2xl font-bold">Boost & Super Like</h3>
+              <p className="text-sm text-white/90">Öne çık, daha fazla eşleş!</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-white/20 rounded-full transition-all"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* Profile Boost */}
+          <button
+            onClick={() => setSelectedBoost('profile')}
+            className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
+              selectedBoost === 'profile'
+                ? 'border-purple-500 bg-purple-50 shadow-lg scale-105'
+                : 'border-gray-200 hover:border-purple-300'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-16 h-16 bg-gradient-to-r ${boosts.profile.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                <boosts.profile.icon className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-gray-800 mb-1">
+                  {boosts.profile.title}
+                </h4>
+                <p className="text-gray-600 text-sm mb-3">
+                  {boosts.profile.description}
+                </p>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-purple-600">
+                    <Clock className="w-4 h-4" />
+                    {boosts.profile.duration}
+                  </div>
+                  <div className="flex items-center gap-1 text-purple-600">
+                    <Zap className="w-4 h-4" />
+                    {boosts.profile.benefit}
+                  </div>
+                </div>
+                <div className="mt-3 text-2xl font-bold text-purple-600">
+                  ₺{boosts.profile.price}
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Super Like */}
+          <button
+            onClick={() => setSelectedBoost('super_like')}
+            className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
+              selectedBoost === 'super_like'
+                ? 'border-pink-500 bg-pink-50 shadow-lg scale-105'
+                : 'border-gray-200 hover:border-pink-300'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-16 h-16 bg-gradient-to-r ${boosts.super_like.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                <boosts.super_like.icon className="w-8 h-8 text-white fill-white" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-gray-800 mb-1">
+                  {boosts.super_like.title}
+                </h4>
+                <p className="text-gray-600 text-sm mb-3">
+                  {boosts.super_like.description}
+                </p>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-pink-600">
+                    <Sparkles className="w-4 h-4" />
+                    {boosts.super_like.duration}
+                  </div>
+                  <div className="flex items-center gap-1 text-pink-600">
+                    <Heart className="w-4 h-4" />
+                    {boosts.super_like.benefit}
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="text-2xl font-bold text-pink-600">
+                    ₺{boosts.super_like.price}
+                  </span>
+                  {profile && (profile.super_likes_remaining || 0) > 0 && (
+                    <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
+                      {profile.super_likes_remaining} ücretsiz kaldı
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="text-sm text-blue-700">
+              💡 <strong>İpucu:</strong> Profil Boost akşam saatlerinde daha etkilidir. 
+              Super Like ise özel teklifler için idealdir!
+            </p>
+          </div>
+
+          {/* Purchase Button */}
+          <button
+            onClick={handlePurchase}
+            disabled={!selectedBoost || processing}
+            className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {processing ? 'İşleniyor...' : selectedBoost ? `₺${boosts[selectedBoost].price} Satın Al` : 'Bir Seçenek Seçin'}
+          </button>
+
+          <p className="text-xs text-gray-500 text-center">
+            Demo modda gerçek ödeme yapılmaz. Özellik hemen aktif olur.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
