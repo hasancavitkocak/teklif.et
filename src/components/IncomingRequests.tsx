@@ -4,7 +4,11 @@ import { supabase, OfferRequest, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import ProfileView from './ProfileView';
 
-export default function IncomingRequests() {
+type IncomingRequestsProps = {
+  onRequestHandled?: () => void;
+};
+
+export default function IncomingRequests({ onRequestHandled }: IncomingRequestsProps) {
   const { profile } = useAuth();
   const [requests, setRequests] = useState<(OfferRequest & { requester: Profile })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,6 +102,7 @@ export default function IncomingRequests() {
       }
 
       fetchRequests();
+      onRequestHandled?.(); // Update parent count
     } catch (error) {
       console.error('Error handling request:', error);
       alert('İşlem sırasında bir hata oluştu');
@@ -271,14 +276,27 @@ export default function IncomingRequests() {
             )}
 
             {request.status === 'accepted' && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
-                <span className="text-green-700 font-medium">
-                  ✅ Teklif kabul edildi! Artık mesajlaşabilirsiniz.
-                </span>
-                <button className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all flex items-center gap-2">
-                  <MessageCircle className="w-4 h-4" />
-                  Mesaj Gönder
-                </button>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-green-800 mb-1">
+                      Teklif Kabul Edildi! 🎉
+                    </h4>
+                    <p className="text-sm text-green-700 mb-4">
+                      Artık mesajlaşabilirsiniz.
+                    </p>
+                    <button 
+                      onClick={() => setSelectedProfile(request.requester)}
+                      className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      Mesaj Gönder
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

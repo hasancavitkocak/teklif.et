@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, MapPin, Users, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Calendar, MapPin, Users, Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,7 +13,11 @@ const categories = [
   { value: 'diger', label: 'Diğer ✨', emoji: '✨' },
 ];
 
-export default function CreateOffer() {
+type Props = {
+  onNavigate: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile') => void;
+};
+
+export default function CreateOffer({ onNavigate }: Props) {
   const { profile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -43,7 +47,7 @@ export default function CreateOffer() {
       // Combine date and time
       const eventDateTime = new Date(`${formData.event_date}T${formData.event_time}`);
       
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('activity_offers')
         .insert({
           creator_id: profile.id,
@@ -63,8 +67,6 @@ export default function CreateOffer() {
 
       if (insertError) throw insertError;
 
-      setSuccess(true);
-      
       // Reset form immediately
       setFormData({
         title: '',
@@ -79,10 +81,7 @@ export default function CreateOffer() {
         image_url: '',
       });
 
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
+      setSuccess(true);
     } catch (err: any) {
       console.error('Error creating offer:', err);
       setError(err.message || 'Teklif oluşturulurken bir hata oluştu');
@@ -96,36 +95,68 @@ export default function CreateOffer() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto pb-24">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Talep Oluştur</h2>
-        <p className="text-gray-600">Yeni bir etkinlik talebi oluşturun</p>
-      </div>
-
+    <>
+      {/* Success Popup Modal */}
       {success && (
-        <div className="mb-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl shadow-lg animate-bounce">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-green-800">Talep Başarıyla Oluşturuldu! 🎉</h3>
-              <p className="text-sm text-green-600">Talebiniz "Keşfet" sayfasında görünüyor</p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <CheckCircle className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                Talep Başarıyla Oluşturuldu! 🎉
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Talebiniz artık "Keşfet" sayfasında görünüyor ve diğer kullanıcılar size teklif gönderebilir.
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setSuccess(false);
+                    onNavigate('discover');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Keşfet Sayfasına Git
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setSuccess(false);
+                    onNavigate('offers');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  Taleplerime Git
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setSuccess(false)}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  Yeni Talep Oluştur
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
-          {error}
-        </div>
-      )}
+      <div className="max-w-2xl mx-auto">{/* Removed pb-24 for modal usage */}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl p-8 space-y-6">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl p-6 md:p-8 space-y-6">
         {/* Title */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-base font-bold text-gray-800 mb-3">
             Başlık *
           </label>
           <input
@@ -133,7 +164,7 @@ export default function CreateOffer() {
             value={formData.title}
             onChange={(e) => handleChange('title', e.target.value)}
             placeholder="Örn: Bu akşam kahve içelim ☕"
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
             required
             maxLength={100}
           />
@@ -141,26 +172,26 @@ export default function CreateOffer() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-base font-bold text-gray-800 mb-3">
             Açıklama *
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Etkinlik hakkında detaylı bilgi verin..."
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all resize-none"
+            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all resize-none"
             rows={4}
             required
             maxLength={500}
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-2">
             {formData.description.length}/500 karakter
           </p>
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-base font-bold text-gray-800 mb-3">
             Kategori *
           </label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -169,13 +200,13 @@ export default function CreateOffer() {
                 key={cat.value}
                 type="button"
                 onClick={() => handleChange('category', cat.value)}
-                className={`p-3 rounded-xl font-medium transition-all text-sm ${
+                className={`p-4 rounded-xl font-semibold transition-all text-base ${
                   formData.category === cat.value
                     ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span className="text-2xl mb-1 block">{cat.emoji}</span>
+                <span className="text-3xl mb-2 block">{cat.emoji}</span>
                 {cat.label.split(' ')[0]}
               </button>
             ))}
@@ -185,8 +216,8 @@ export default function CreateOffer() {
         {/* Location */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 inline mr-1" />
+            <label className="block text-base font-bold text-gray-800 mb-3">
+              <MapPin className="w-5 h-5 inline mr-1" />
               Şehir *
             </label>
             <input
@@ -194,12 +225,12 @@ export default function CreateOffer() {
               value={formData.city}
               onChange={(e) => handleChange('city', e.target.value)}
               placeholder="İstanbul"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-base font-bold text-gray-800 mb-3">
               Semt / İlçe
             </label>
             <input
@@ -207,7 +238,7 @@ export default function CreateOffer() {
               value={formData.district}
               onChange={(e) => handleChange('district', e.target.value)}
               placeholder="Kadıköy"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
             />
           </div>
         </div>
@@ -215,8 +246,8 @@ export default function CreateOffer() {
         {/* Date and Time */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <Calendar className="w-4 h-4 inline mr-1" />
+            <label className="block text-base font-bold text-gray-800 mb-3">
+              <Calendar className="w-5 h-5 inline mr-1" />
               Tarih *
             </label>
             <input
@@ -224,19 +255,19 @@ export default function CreateOffer() {
               value={formData.event_date}
               onChange={(e) => handleChange('event_date', e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-base font-bold text-gray-800 mb-3">
               Saat *
             </label>
             <input
               type="time"
               value={formData.event_time}
               onChange={(e) => handleChange('event_time', e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
               required
             />
           </div>
@@ -244,7 +275,7 @@ export default function CreateOffer() {
 
         {/* Offer Type */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-base font-bold text-gray-800 mb-3">
             Teklif Türü *
           </label>
           <div className="grid grid-cols-2 gap-4">
@@ -254,25 +285,25 @@ export default function CreateOffer() {
                 handleChange('offer_type', 'birebir');
                 handleChange('participant_count', 2);
               }}
-              className={`p-4 rounded-xl font-medium transition-all ${
+              className={`p-5 rounded-xl font-semibold transition-all text-base ${
                 formData.offer_type === 'birebir'
                   ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <Users className="w-6 h-6 mx-auto mb-2" />
+              <Users className="w-7 h-7 mx-auto mb-2" />
               Birebir
             </button>
             <button
               type="button"
               onClick={() => handleChange('offer_type', 'grup')}
-              className={`p-4 rounded-xl font-medium transition-all ${
+              className={`p-5 rounded-xl font-semibold transition-all text-base ${
                 formData.offer_type === 'grup'
                   ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <Users className="w-6 h-6 mx-auto mb-2" />
+              <Users className="w-7 h-7 mx-auto mb-2" />
               Grup Etkinliği
             </button>
           </div>
@@ -281,8 +312,8 @@ export default function CreateOffer() {
         {/* Participant Count */}
         {formData.offer_type === 'grup' && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <Users className="w-4 h-4 inline mr-1" />
+            <label className="block text-base font-bold text-gray-800 mb-3">
+              <Users className="w-5 h-5 inline mr-1" />
               Katılımcı Sayısı: {formData.participant_count} kişi
             </label>
             <input
@@ -300,30 +331,16 @@ export default function CreateOffer() {
           </div>
         )}
 
-        {/* Image URL (optional) */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            <ImageIcon className="w-4 h-4 inline mr-1" />
-            Görsel URL (İsteğe Bağlı)
-          </label>
-          <input
-            type="url"
-            value={formData.image_url}
-            onChange={(e) => handleChange('image_url', e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
-          />
-        </div>
-
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="w-full py-5 text-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           {loading ? 'Oluşturuluyor...' : '🎉 Talebimi Yayınla'}
         </button>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 }

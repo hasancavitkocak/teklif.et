@@ -33,7 +33,7 @@ export default function Discover() {
 
   useEffect(() => {
     fetchProfiles();
-  }, [currentProfile]);
+  }, [currentProfile, filters]);
 
   const fetchProfiles = async () => {
     if (!currentProfile) {
@@ -272,6 +272,49 @@ export default function Discover() {
           </div>
         </div>
         <p className="text-gray-600">Sizin için seçilen profiller</p>
+        
+        {/* Hızlı Filtre Butonları */}
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+          <button
+            onClick={() => {
+              setFilters({...filters, maxDistance: 10});
+              setCurrentIndex(0);
+            }}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              filters.maxDistance === 10
+                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+            }`}
+          >
+            📍 Yakınlarımda (10km)
+          </button>
+          <button
+            onClick={() => {
+              setFilters({...filters, maxDistance: 50});
+              setCurrentIndex(0);
+            }}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              filters.maxDistance === 50
+                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+            }`}
+          >
+            🚗 Şehrimde (50km)
+          </button>
+          <button
+            onClick={() => {
+              setFilters({...filters, maxDistance: 100});
+              setCurrentIndex(0);
+            }}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              filters.maxDistance === 100
+                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+            }`}
+          >
+            🌍 Tüm Bölge (100km)
+          </button>
+        </div>
       </div>
 
       {showFilters && (

@@ -24,6 +24,21 @@
     overflow: hidden;
   }
 
+  /* Safe area for bottom (iOS notch & Android navigation) */
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Prevent overscroll bounce */
+  .overscroll-contain {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
@@ -48,4 +63,75 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Scale-in animation for success popup */
+  @keyframes scale-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+}
+
+/* Range slider styles */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"].slider::-webkit-slider-track {
+  background: linear-gradient(to right, #ec4899, #f43f5e);
+  height: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: white;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  border: 3px solid #ec4899;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  margin-top: -0.5rem;
+}
+
+input[type="range"].slider::-moz-range-track {
+  background: linear-gradient(to right, #ec4899, #f43f5e);
+  height: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+input[type="range"].slider::-moz-range-thumb {
+  background: white;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  border: 3px solid #ec4899;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+input[type="range"].slider:focus {
+  outline: none;
+}
+
+input[type="range"].slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
+}
+
+input[type="range"].slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
 }

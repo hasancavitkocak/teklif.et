@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Calendar, Heart, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Profile } from '../lib/supabase';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 type ProfileViewProps = {
   profile: Profile;
@@ -11,9 +12,11 @@ type ProfileViewProps = {
 };
 
 export default function ProfileView({ profile, onBack, onMessage, showMessageButton = false }: ProfileViewProps) {
+  const { profile: currentUser } = useAuth();
   const [photos, setPhotos] = useState<string[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   useEffect(() => {
     fetchPhotos();
@@ -54,6 +57,46 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
 
   const prevPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
+
+  const handleMessageClick = async () => {
+    if (!currentUser || !onMessage || sendingMessage) return;
+
+    setSendingMessage(true);
+
+    try {
+      // Check if match already exists
+      const { data: existingMatch } = await supabase
+        .from('offers')
+        .select('id')
+        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${profile.id}),and(sender_id.eq.${profile.id},receiver_id.eq.${currentUser.id})`)
+        .eq('status', 'matched')
+        .single();
+
+      if (existingMatch) {
+        // Match already exists, just open chat
+        onMessage();
+      } else {
+        // No match exists, create one first
+        const { error } = await supabase
+          .from('offers')
+          .insert({
+            sender_id: currentUser.id,
+            receiver_id: profile.id,
+            status: 'matched'
+          });
+
+        if (error) throw error;
+
+        // Now open chat
+        onMessage();
+      }
+    } catch (error) {
+      console.error('Error handling message:', error);
+      alert('Mesaj gönderilirken bir hata oluştu');
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
 
@@ -208,11 +251,12 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
           {/* Message Button */}
           {showMessageButton && onMessage && (
             <button
-              onClick={onMessage}
-              className="mt-6 w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+              onClick={handleMessageClick}
+              disabled={sendingMessage}
+              className="mt-6 w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MessageCircle className="w-5 h-5" />
-              Mesaj Gönder
+              {sendingMessage ? 'Açılıyor...' : 'Mesaj Gönder'}
             </button>
           )}
         </div>

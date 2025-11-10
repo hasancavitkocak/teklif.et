@@ -153,18 +153,39 @@ export default function Premium() {
 
   return (
     <div className="max-w-2xl mx-auto pb-24">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full mb-4">
-          <Crown className="w-8 h-8 text-white" />
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-3xl shadow-2xl p-8 mb-8 overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+        
+        <div className="relative text-center text-white">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4">
+            <Crown className="w-10 h-10" />
+          </div>
+          <h2 className="text-4xl font-bold mb-3">
+            Premium'a Geçin
+          </h2>
+          <p className="text-lg text-white/90 mb-6">
+            Daha fazla eşleşme ve özel özellikler için
+          </p>
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              <span>Sınırsız Teklif</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              <span>Özel Özellikler</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              <span>Öncelikli Destek</span>
+            </div>
+          </div>
         </div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
-          Premium'a Geçin
-        </h2>
-        <p className="text-gray-600">
-          Daha fazla eşleşme ve özel özellikler için
-        </p>
       </div>
 
+      {/* Pricing Cards */}
       <div className="grid md:grid-cols-3 gap-4 mb-8">
         {(Object.keys(plans) as PackageType[]).map((planKey) => {
           const plan = plans[planKey];
@@ -176,51 +197,62 @@ export default function Premium() {
               onClick={() => setSelectedPlan(planKey)}
               className={`relative p-6 rounded-2xl border-2 transition-all text-left ${
                 isSelected
-                  ? 'border-pink-500 bg-pink-50 shadow-lg scale-105'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-              }`}
+                  ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-xl scale-105'
+                  : 'border-gray-200 bg-white hover:border-amber-300 hover:shadow-lg'
+              } ${plan.popular ? 'ring-2 ring-green-400' : ''}`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                  En Popüler
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                  ⭐ En Popüler
                 </div>
               )}
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                {plan.name}
-              </h3>
-              <div className="mb-3">
-                <span className="text-3xl font-bold text-gray-800">
-                  ₺{plan.price}
-                </span>
-              </div>
-              <div className="text-sm text-gray-600 mb-2">
-                {plan.offers ? `${plan.offers} Teklif` : 'Sınırsız Teklif'}
-              </div>
-              <div className="text-xs text-gray-500 mb-3">
-                {plan.duration}
-              </div>
-              {plan.savings && (
-                <div className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full inline-block">
-                  {plan.savings}
+              <div className="text-center">
+                <h3 className="text-lg font-bold text-gray-800 mb-3 mt-2">
+                  {plan.name}
+                </h3>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    ₺{plan.price}
+                  </span>
                 </div>
-              )}
+                <div className="space-y-2 mb-4">
+                  <div className="text-base font-semibold text-gray-700">
+                    {plan.offers ? `${plan.offers} Teklif` : '🔥 Sınırsız Teklif'}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {plan.duration}
+                  </div>
+                </div>
+                {plan.savings && (
+                  <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full inline-block">
+                    {plan.savings}
+                  </div>
+                )}
+                {isSelected && (
+                  <div className="mt-4 flex items-center justify-center gap-2 text-amber-600 font-semibold text-sm">
+                    <Check className="w-4 h-4" />
+                    Seçildi
+                  </div>
+                )}
+              </div>
             </button>
           );
         })}
       </div>
 
+      {/* Features Grid */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">
-          Premium Özellikler
+        <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">
+          ✨ Premium Özellikler
         </h3>
-        <div className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-4">
           {features.map((feature, index) => (
-            <div key={index} className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-rose-100 rounded-xl flex items-center justify-center">
-                <feature.icon className="w-6 h-6 text-pink-600" />
+            <div key={index} className="flex gap-3 p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 hover:shadow-md transition-all">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-xl flex items-center justify-center">
+                <feature.icon className="w-6 h-6 text-amber-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-800 mb-1">
+                <h4 className="font-bold text-gray-800 mb-1">
                   {feature.title}
                 </h4>
                 <p className="text-sm text-gray-600">
@@ -232,22 +264,28 @@ export default function Premium() {
         </div>
       </div>
 
+      {/* CTA Button */}
       <button
         onClick={handleSubscribe}
         disabled={processing}
-        className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all disabled:opacity-50"
+        className="w-full py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {processing ? 'İşleniyor...' : `${plans[selectedPlan].price}₺ Ödemeye Geç`}
+        <Crown className="w-6 h-6" />
+        {processing ? 'İşleniyor...' : `₺${plans[selectedPlan].price} - Hemen Başla`}
       </button>
+      
+      <p className="text-center text-sm text-gray-500 mt-4">
+        🔒 Güvenli ödeme • 💳 Tüm kartlar kabul edilir • ✅ Anında aktivasyon
+      </p>
 
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
             <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-              Ödeme Simülasyonu
+              Ödeme Onayı
             </h3>
             <p className="text-gray-600 mb-6 text-center">
-              Bu demo sürümde gerçek ödeme yapılmaz. Premium'u aktifleştirmek için butona tıklayın.
+              Seçtiğiniz paketi aktifleştirmek için onaylayın.
             </p>
             <div className="bg-gray-50 rounded-xl p-4 mb-6">
               <div className="flex justify-between mb-2">

@@ -5,10 +5,18 @@ import { useAuth } from '../contexts/AuthContext';
 
 type OfferWithCount = ActivityOffer & { pendingRequestCount?: number };
 
-export default function MyOffers() {
+type MyOffersProps = {
+  onViewRequests?: (offerId: string) => void;
+};
+
+export default function MyOffers({ onViewRequests }: MyOffersProps) {
   const { profile } = useAuth();
   const [offers, setOffers] = useState<OfferWithCount[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; offerId: string | null }>({
+    show: false,
+    offerId: null,
+  });
 
   useEffect(() => {
     if (profile) {
@@ -20,6 +28,9 @@ export default function MyOffers() {
     if (!profile) return;
 
     try {
+      // Expire past offers first
+      await supabase.rpc('expire_past_offers').catch(() => {});
+
       const { data, error } = await supabase
         .from('activity_offers')
         .select('*')
@@ -49,22 +60,31 @@ export default function MyOffers() {
     }
   };
 
-  const deleteOffer = async (offerId: string) => {
-    if (!confirm('Bu teklifi silmek istediğinizden emin misiniz?')) return;
+  const handleDeleteClick = (offerId: string) => {
+    setDeleteConfirm({ show: true, offerId });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.offerId) return;
 
     try {
       const { error } = await supabase
         .from('activity_offers')
         .delete()
-        .eq('id', offerId);
+        .eq('id', deleteConfirm.offerId);
 
       if (error) throw error;
 
+      setDeleteConfirm({ show: false, offerId: null });
       fetchMyOffers();
     } catch (error) {
       console.error('Error deleting offer:', error);
       alert('Teklif silinirken bir hata oluştu');
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm({ show: false, offerId: null });
   };
 
   const formatDate = (dateString: string) => {
@@ -92,14 +112,35 @@ export default function MyOffers() {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      active: { text: 'Aktif', class: 'bg-green-100 text-green-700', icon: '✅' },
-      completed: { text: 'Tamamlandı', class: 'bg-blue-100 text-blue-700', icon: '🎉' },
-      cancelled: { text: 'İptal Edildi', class: 'bg-gray-100 text-gray-700', icon: '❌' },
+      active: { 
+        text: 'Aktif', 
+        class: 'bg-green-50 text-green-600 border border-green-200', 
+        icon: '●',
+        iconClass: 'text-green-500 animate-pulse'
+      },
+      completed: { 
+        text: 'Tamamlandı', 
+        class: 'bg-blue-50 text-blue-600 border border-blue-200', 
+        icon: '✓',
+        iconClass: 'text-blue-500'
+      },
+      cancelled: { 
+        text: 'İptal', 
+        class: 'bg-gray-50 text-gray-500 border border-gray-200', 
+        icon: '×',
+        iconClass: 'text-gray-400'
+      },
+      expired: { 
+        text: 'Süresi Doldu', 
+        class: 'bg-orange-50 text-orange-600 border border-orange-200', 
+        icon: '⏱',
+        iconClass: 'text-orange-500'
+      },
     };
     const badge = badges[status as keyof typeof badges] || badges.active;
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badge.class} flex items-center gap-1`}>
-        <span>{badge.icon}</span>
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${badge.class}`}>
+        <span className={badge.iconClass}>{badge.icon}</span>
         {badge.text}
       </span>
     );
@@ -201,7 +242,7 @@ export default function MyOffers() {
 
             <div className="flex gap-2">
               <button
-                onClick={() => deleteOffer(offer.id)}
+                onClick={() => handleDeleteClick(offer.id)}
                 disabled={offer.status === 'completed'}
                 className="flex-1 py-2 px-4 border-2 border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -209,6 +250,7 @@ export default function MyOffers() {
                 Sil
               </button>
               <button
+                onClick={() => onViewRequests?.(offer.id)}
                 disabled={offer.status === 'completed'}
                 className="flex-1 py-2 px-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -219,6 +261,40 @@ export default function MyOffers() {
           </div>
         </div>
       ))}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Talebi Sil
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Bu talebi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                >
+                  Sil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -163,6 +163,7 @@ export default function Matches() {
         profile={selectedProfile}
         onBack={() => setSelectedProfile(null)}
         onMessage={() => {
+          // Direkt chat'i aç - zaten eşleşme var çünkü Matches sayfasındayız
           setSelectedProfile(null);
           setSelectedChat(selectedProfile);
         }}

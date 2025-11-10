@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { ArrowLeft, Send, Heart, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import ProfileView from './ProfileView';
 
 type Message = {
   id: string;
@@ -29,6 +30,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -132,6 +134,31 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
     }
   };
 
+  if (showProfile) {
+    return (
+      <ProfileView
+        profile={{
+          ...matchedUser,
+          gender: matchedUser.gender as 'erkek' | 'kadın' | 'diğer',
+          bio: '',
+          latitude: undefined,
+          longitude: undefined,
+          is_premium: false,
+          is_boosted: false,
+          boost_expires_at: undefined,
+          super_likes_remaining: 0,
+          daily_offers_count: 0,
+          last_offer_reset: new Date().toISOString(),
+          free_offers_used: 0,
+          total_offers_sent: 0,
+          created_at: new Date().toISOString(),
+        }}
+        onBack={() => setShowProfile(false)}
+        showMessageButton={false}
+      />
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -144,9 +171,9 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto h-[calc(100vh-140px)] flex flex-col bg-white shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 md:relative md:max-w-2xl md:mx-auto md:h-[calc(100vh-140px)] flex flex-col bg-white md:shadow-2xl z-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white p-6 flex items-center gap-4 shadow-lg">
+      <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white p-4 md:p-6 flex items-center gap-3 md:gap-4 shadow-lg flex-shrink-0">
         <button
           onClick={onBack}
           className="p-3 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-105"
@@ -154,7 +181,10 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
           <ArrowLeft className="w-6 h-6 text-white" />
         </button>
         
-        <div className="flex items-center gap-4 flex-1">
+        <button 
+          onClick={() => setShowProfile(true)}
+          className="flex items-center gap-4 flex-1 hover:bg-white/10 rounded-xl p-2 -m-2 transition-all"
+        >
           <div className="relative">
             {matchedUser.photo_url ? (
               <img
@@ -172,7 +202,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
           </div>
           
-          <div>
+          <div className="text-left">
             <h3 className="font-bold text-white text-lg">
               {matchedUser.name}, {matchedUser.age}
             </h3>
@@ -181,7 +211,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
               {matchedUser.city}
             </p>
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-2">
           <Heart className="w-6 h-6 text-white fill-white animate-pulse" />
@@ -189,7 +219,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-pink-50/50 via-white to-rose-50/30">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-40 space-y-4 bg-gradient-to-b from-pink-50/50 via-white to-rose-50/30 overscroll-contain">
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -252,30 +282,29 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <div className="bg-white border-t border-gray-100 p-6">
-        <form onSubmit={sendMessage} className="flex gap-4 items-end">
+      {/* Message Input - Fixed above bottom navigation */}
+      <div className="fixed bottom-16 left-0 right-0 md:sticky md:bottom-0 bg-white px-4 pt-4 pb-3 md:pb-4 flex-shrink-0 z-40">
+        <form onSubmit={sendMessage} className="flex gap-3 items-center mb-3">
           <div className="flex-1 relative">
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Mesajınızı yazın..."
-              className="w-full px-6 py-4 pr-14 border-2 border-gray-200 rounded-3xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400"
+              placeholder="Mesaj yazın..."
+              className="w-full px-4 py-3 pr-12 border-2 rounded-[20px] focus:ring-2 focus:ring-pink-100 outline-none transition-all bg-white text-gray-800 placeholder-gray-400"
+              style={{ borderColor: '#ff99cc' }}
               disabled={sending}
+              autoComplete="off"
             />
             <button
               type="submit"
               disabled={!newMessage.trim() || sending}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full hover:shadow-xl hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </button>
           </div>
         </form>
-        <p className="text-xs text-gray-400 mt-2 text-center">
-          Enter tuşuna basarak mesaj gönderebilirsiniz
-        </p>
       </div>
     </div>
   );

@@ -1,17 +1,21 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Heart, Search, Gift, Users, Crown, User, LogOut } from 'lucide-react';
+import { Heart, Search, Gift, Users, Crown, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
+type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies';
+
 type LayoutProps = {
   children: ReactNode;
-  currentPage: 'discover' | 'offers' | 'matches' | 'premium' | 'profile';
-  onNavigate: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile') => void;
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
 };
 
 export default function Layout({ children, currentPage, onNavigate }: LayoutProps) {
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  
+  const isLegalPage = ['faq', 'help', 'report', 'privacy', 'terms', 'kvkk', 'cookies'].includes(currentPage);
 
   useEffect(() => {
     if (profile) {
@@ -68,101 +72,119 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Heart className="w-7 h-7 text-pink-500 fill-pink-500" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-              Teklif.et
-            </h1>
+      {isLegalPage ? (
+        // Legal pages header with back button
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <button
+              onClick={() => onNavigate('profile')}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Geri Dön</span>
+            </button>
           </div>
+        </header>
+      ) : (
+        // Normal header
+        <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="w-7 h-7 text-pink-500 fill-pink-500" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+                Teklif.et
+              </h1>
+            </div>
 
-          <div className="flex items-center gap-4">
-            {profile?.is_premium && (
-              <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                <Crown className="w-4 h-4" />
-                Premium
-              </div>
-            )}
-            <span className="text-gray-700 font-medium hidden sm:inline">{profile?.name}</span>
+            <div className="flex items-center gap-4">
+              {profile?.is_premium && (
+                <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <Crown className="w-4 h-4" />
+                  Premium
+                </div>
+              )}
+              <span className="text-gray-700 font-medium hidden sm:inline">{profile?.name}</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className={`mx-auto px-4 py-6 ${isLegalPage ? 'max-w-full' : 'max-w-7xl'}`}>
         {children}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-lg z-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-around py-3">
-            <button
-              onClick={() => onNavigate('discover')}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-                currentPage === 'discover'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-pink-400'
-              }`}
-            >
-              <Search className="w-6 h-6" />
-              <span className="text-xs font-medium">Keşfet</span>
-            </button>
+      {!isLegalPage && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50 pb-safe" style={{ borderTop: '1px solid #eaeaea' }}>
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-around py-3">
+              <button
+                onClick={() => onNavigate('discover')}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  currentPage === 'discover'
+                    ? 'text-pink-500'
+                    : 'text-gray-500 hover:text-pink-400'
+                }`}
+              >
+                <Search className="w-6 h-6" />
+                <span className="text-xs font-medium">Keşfet</span>
+              </button>
 
-            <button
-              onClick={() => onNavigate('offers')}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
-                currentPage === 'offers'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-pink-400'
-              }`}
-            >
-              <Gift className="w-6 h-6" />
-              <span className="text-xs font-medium">Talepler</span>
-            </button>
+              <button
+                onClick={() => onNavigate('offers')}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
+                  currentPage === 'offers'
+                    ? 'text-pink-500'
+                    : 'text-gray-500 hover:text-pink-400'
+                }`}
+              >
+                <Gift className="w-6 h-6" />
+                <span className="text-xs font-medium">Talepler</span>
+              </button>
 
-            <button
-              onClick={() => onNavigate('matches')}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
-                currentPage === 'matches'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-pink-400'
-              }`}
-            >
-              <Users className="w-6 h-6" />
-              <span className="text-xs font-medium">Eşleşmeler</span>
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </button>
+              <button
+                onClick={() => onNavigate('matches')}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
+                  currentPage === 'matches'
+                    ? 'text-pink-500'
+                    : 'text-gray-500 hover:text-pink-400'
+                }`}
+              >
+                <Users className="w-6 h-6" />
+                <span className="text-xs font-medium">Eşleşmeler</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={() => onNavigate('premium')}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-                currentPage === 'premium'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-pink-400'
-              }`}
-            >
-              <Crown className="w-6 h-6" />
-              <span className="text-xs font-medium">Premium</span>
-            </button>
+              <button
+                onClick={() => onNavigate('premium')}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  currentPage === 'premium'
+                    ? 'text-pink-500'
+                    : 'text-gray-500 hover:text-pink-400'
+                }`}
+              >
+                <Crown className="w-6 h-6" />
+                <span className="text-xs font-medium">Premium</span>
+              </button>
 
-            <button
-              onClick={() => onNavigate('profile')}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-                currentPage === 'profile'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-pink-400'
-              }`}
-            >
-              <User className="w-6 h-6" />
-              <span className="text-xs font-medium">Profil</span>
-            </button>
+              <button
+                onClick={() => onNavigate('profile')}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  currentPage === 'profile'
+                    ? 'text-pink-500'
+                    : 'text-gray-500 hover:text-pink-400'
+                }`}
+              >
+                <User className="w-6 h-6" />
+                <span className="text-xs font-medium">Profil</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
     </div>
   );
 }

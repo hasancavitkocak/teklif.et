@@ -95,7 +95,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white p-6 flex items-center justify-between z-10 rounded-t-3xl">
           <div className="flex items-center gap-3">
             <Sparkles className="w-8 h-8" />
             <div>
@@ -116,34 +116,39 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
           {/* Profile Boost */}
           <button
             onClick={() => setSelectedBoost('profile')}
-            className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
+            className={`relative w-full p-5 rounded-2xl border-2 transition-all ${
               selectedBoost === 'profile'
-                ? 'border-purple-500 bg-purple-50 shadow-lg scale-105'
-                : 'border-gray-200 hover:border-purple-300'
+                ? 'border-purple-500 bg-purple-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-purple-300'
             }`}
           >
-            <div className="flex items-start gap-4">
-              <div className={`w-16 h-16 bg-gradient-to-r ${boosts.profile.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+            {selectedBoost === 'profile' && (
+              <div className="absolute top-3 right-3 bg-purple-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                ✓
+              </div>
+            )}
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 bg-gradient-to-br ${boosts.profile.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
                 <boosts.profile.icon className="w-8 h-8 text-white" />
               </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">
+              <div className="flex-1 text-left">
+                <h4 className="text-lg font-bold text-gray-900 mb-1">
                   {boosts.profile.title}
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <p className="text-sm text-gray-600 mb-3">
                   {boosts.profile.description}
                 </p>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1 text-purple-600">
-                    <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
                     {boosts.profile.duration}
-                  </div>
-                  <div className="flex items-center gap-1 text-purple-600">
-                    <Zap className="w-4 h-4" />
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Zap className="w-3.5 h-3.5" />
                     {boosts.profile.benefit}
-                  </div>
+                  </span>
                 </div>
-                <div className="mt-3 text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-purple-600">
                   ₺{boosts.profile.price}
                 </div>
               </div>
@@ -153,40 +158,45 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
           {/* Super Like */}
           <button
             onClick={() => setSelectedBoost('super_like')}
-            className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
+            className={`relative w-full p-5 rounded-2xl border-2 transition-all ${
               selectedBoost === 'super_like'
-                ? 'border-pink-500 bg-pink-50 shadow-lg scale-105'
-                : 'border-gray-200 hover:border-pink-300'
+                ? 'border-pink-500 bg-pink-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-pink-300'
             }`}
           >
-            <div className="flex items-start gap-4">
-              <div className={`w-16 h-16 bg-gradient-to-r ${boosts.super_like.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+            {selectedBoost === 'super_like' && (
+              <div className="absolute top-3 right-3 bg-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                ✓
+              </div>
+            )}
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 bg-gradient-to-br ${boosts.super_like.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
                 <boosts.super_like.icon className="w-8 h-8 text-white fill-white" />
               </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">
+              <div className="flex-1 text-left">
+                <h4 className="text-lg font-bold text-gray-900 mb-1">
                   {boosts.super_like.title}
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <p className="text-sm text-gray-600 mb-3">
                   {boosts.super_like.description}
                 </p>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1 text-pink-600">
-                    <Sparkles className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" />
                     {boosts.super_like.duration}
-                  </div>
-                  <div className="flex items-center gap-1 text-pink-600">
-                    <Heart className="w-4 h-4" />
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="w-3.5 h-3.5" />
                     {boosts.super_like.benefit}
-                  </div>
+                  </span>
                 </div>
-                <div className="mt-3 flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-pink-600">
                     ₺{boosts.super_like.price}
                   </span>
                   {profile && (profile.super_likes_remaining || 0) > 0 && (
-                    <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
-                      {profile.super_likes_remaining} ücretsiz kaldı
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                      {profile.super_likes_remaining} ücretsiz
                     </span>
                   )}
                 </div>
@@ -195,25 +205,44 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
           </button>
 
           {/* Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-sm text-blue-700">
-              💡 <strong>İpucu:</strong> Profil Boost akşam saatlerinde daha etkilidir. 
-              Super Like ise özel teklifler için idealdir!
-            </p>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-900 mb-1">
+                  💡 İpucu
+                </p>
+                <p className="text-sm text-blue-700">
+                  Profil Boost akşam saatlerinde daha etkilidir. Super Like ise özel teklifler için idealdir!
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Purchase Button */}
           <button
             onClick={handlePurchase}
             disabled={!selectedBoost || processing}
-            className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {processing ? 'İşleniyor...' : selectedBoost ? `₺${boosts[selectedBoost].price} Satın Al` : 'Bir Seçenek Seçin'}
+            {processing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                İşleniyor...
+              </>
+            ) : selectedBoost ? (
+              <>
+                <Zap className="w-5 h-5" />
+                ₺{boosts[selectedBoost].price} - Hemen Aktifleştir
+              </>
+            ) : (
+              'Bir Seçenek Seçin'
+            )}
           </button>
 
-          <p className="text-xs text-gray-500 text-center">
-            Demo modda gerçek ödeme yapılmaz. Özellik hemen aktif olur.
-          </p>
+
         </div>
       </div>
     </div>

@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Calendar, Users, Heart, Filter, Zap, Send } from 'lucide-react';
+import { MapPin, Calendar, Users, Heart, Filter, Zap, Send, CheckCircle, ArrowRight, Plus } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import OfferRequestModal from './OfferRequestModal';
 import ProfileView from './ProfileView';
 import BoostModal from './BoostModal';
+import CreateOfferWizard from './CreateOfferWizard';
 
-export default function DiscoverOffers() {
+type Props = {
+  onNavigate?: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile') => void;
+};
+
+export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const { profile } = useAuth();
   const [offers, setOffers] = useState<(ActivityOffer & { creator: Profile })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +19,8 @@ export default function DiscoverOffers() {
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showBoostModal, setShowBoostModal] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showCreateOffer, setShowCreateOffer] = useState(false);
   const [filters, setFilters] = useState({
     city: '',
     category: 'all' as string,
@@ -30,6 +37,9 @@ export default function DiscoverOffers() {
     if (!profile) return;
 
     try {
+      // First, expire past offers
+      await supabase.rpc('expire_past_offers').catch(() => {});
+
       let query = supabase
         .from('activity_offers')
         .select('*, creator:creator_id(*)')
@@ -38,8 +48,11 @@ export default function DiscoverOffers() {
         .gte('event_date', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      if (filters.city) {
-        query = query.ilike('city', `%${filters.city}%`);
+      // Varsayılan olarak kullanıcının şehrindeki talepleri göster
+      // Eğer filtre uygulanmışsa, filtreyi kullan
+      const cityFilter = filters.city || profile.city;
+      if (cityFilter) {
+        query = query.ilike('city', `%${cityFilter}%`);
       }
 
       if (filters.category !== 'all') {
@@ -54,15 +67,23 @@ export default function DiscoverOffers() {
 
       if (error) throw error;
 
-      // Filter out offers user already requested
+      // Filter out offers user already requested OR that have been accepted by someone else
       const { data: myRequests } = await supabase
         .from('offer_requests')
-        .select('offer_id')
+        .select('offer_id, status')
         .eq('requester_id', profile.id);
 
+      // Get all accepted offers (by anyone)
+      const { data: acceptedRequests } = await supabase
+        .from('offer_requests')
+        .select('offer_id')
+        .eq('status', 'accepted');
+
       const requestedOfferIds = myRequests?.map(r => r.offer_id) || [];
+      const acceptedOfferIds = acceptedRequests?.map(r => r.offer_id) || [];
+      
       let filteredOffers = (data || []).filter(
-        offer => !requestedOfferIds.includes(offer.id)
+        offer => !requestedOfferIds.includes(offer.id) && !acceptedOfferIds.includes(offer.id)
       );
 
       // Sort: Boosted profiles first, then by created_at
@@ -144,30 +165,40 @@ export default function DiscoverOffers() {
   return (
     <div className="max-w-4xl mx-auto pb-24">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <h2 className="text-2xl font-bold text-gray-800">Keşfet</h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowBoostModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all"
-            >
-              <Zap className="w-4 h-4" />
-              Boost
-            </button>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                showFilters
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                  : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink-300'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              Filtrele
-            </button>
-          </div>
         </div>
-        <p className="text-gray-600">Yakınınızdaki etkinlik talepleri</p>
+        
+        {/* Action Buttons Row */}
+        <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+          <button
+            onClick={() => setShowCreateOffer(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            Talep Oluştur
+          </button>
+          <button
+            onClick={() => setShowBoostModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+          >
+            <Zap className="w-4 h-4" />
+            Boost
+          </button>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
+              showFilters
+                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink-300'
+            }`}
+          >
+            <Filter className="w-4 h-4" />
+            Filtrele
+          </button>
+        </div>
+        
+        <p className="text-gray-600 text-sm">Yakınınızdaki etkinlik talepleri</p>
       </div>
 
       {showFilters && (
@@ -340,6 +371,54 @@ export default function DiscoverOffers() {
         </div>
       )}
 
+      {/* Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <CheckCircle className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                Teklif Başarıyla Gönderildi! 🎉
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Teklifiniz karşı tarafa iletildi. Yanıt geldiğinde sizi bilgilendireceğiz.
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowSuccessPopup(false);
+                    onNavigate?.('offers');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  Gönderilen Tekliflerime Git
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSuccessPopup(false);
+                    onNavigate?.('matches');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  Eşleşmelerime Git
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setShowSuccessPopup(false)}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  Keşfetmeye Devam Et
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Offer Request Modal */}
       {selectedOffer && (
         <OfferRequestModal
@@ -347,9 +426,35 @@ export default function DiscoverOffers() {
           onClose={() => setSelectedOffer(null)}
           onSuccess={() => {
             setSelectedOffer(null);
+            setShowSuccessPopup(true);
             fetchOffers();
           }}
         />
+      )}
+
+      {/* Create Offer Modal */}
+      {showCreateOffer && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="bg-gradient-to-br from-pink-50 via-white to-rose-50 rounded-3xl shadow-2xl max-w-2xl w-full my-8">
+              <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 rounded-t-3xl flex items-center justify-between z-10">
+                <h2 className="text-xl font-bold text-gray-800">Yeni Talep Oluştur</h2>
+                <button
+                  onClick={() => setShowCreateOffer(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-all"
+                >
+                  <Plus className="w-6 h-6 text-gray-600 rotate-45" />
+                </button>
+              </div>
+              <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <CreateOfferWizard onNavigate={(page) => {
+                  setShowCreateOffer(false);
+                  onNavigate?.(page);
+                }} />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Boost Modal */}

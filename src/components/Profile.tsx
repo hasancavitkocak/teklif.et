@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Edit2, Save, X, LogOut } from 'lucide-react';
+import { Edit2, Save, X, LogOut, HelpCircle, Shield, FileText, Cookie, AlertCircle, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useModal } from '../contexts/ModalContext';
 import { supabase } from '../lib/supabase';
 import PhotoGallery from './PhotoGallery';
 import PhotoGalleryView from './PhotoGalleryView';
+import { getFreeOffersLimit } from '../config/app.config';
 
 const turkishCities = [
   'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Konya',
@@ -12,12 +12,16 @@ const turkishCities = [
   'Samsun', 'Denizli', 'Adapazarı', 'Malatya', 'Kahramanmaraş', 'Erzurum'
 ];
 
-export default function Profile() {
+interface ProfileProps {
+  onNavigate: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies') => void;
+}
+
+export default function Profile({ onNavigate }: ProfileProps) {
   const { profile, refreshProfile, signOut } = useAuth();
-  const { showModal, showToast } = useModal();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -117,25 +121,29 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-        {/* Decorative header background - just for visual appeal */}
-        <div className="relative h-48 bg-gradient-to-br from-pink-200 via-rose-200 to-pink-300">
-          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
-            {profile.photo_url ? (
-              <img
-                src={profile.photo_url}
-                alt={profile.name}
-                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-xl"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white text-5xl font-bold border-4 border-white shadow-xl">
-                {profile.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* Compact header with profile photo */}
+        <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6 flex items-center gap-4">
+          {profile.photo_url ? (
+            <img
+              src={profile.photo_url}
+              alt={profile.name}
+              className="w-20 h-20 rounded-full object-cover border-3 border-white shadow-lg"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-white text-3xl font-bold border-3 border-white shadow-lg">
+              {profile.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-white mb-1">
+              {profile.name}, {profile.age}
+            </h2>
+            <p className="text-pink-100">{profile.city}</p>
           </div>
         </div>
 
-        <div className="pt-20 px-8 pb-8">
+        <div className="p-4 md:p-6">
           {/* Photo Gallery Section */}
           {isEditing && (
             <div className="mb-8 pb-8 border-b border-gray-200">
@@ -226,30 +234,25 @@ export default function Profile() {
               </div>
             </div>
           ) : (
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold text-gray-800">
-                {profile.name}, {profile.age}
-              </h2>
-              <p className="text-gray-600 text-lg">{profile.city}</p>
-
+            <div className="space-y-4">
               {profile.bio && (
-                <div className="bg-gray-50 rounded-xl p-6 text-left">
-                  <h3 className="font-semibold text-gray-800 mb-2">Hakkımda</h3>
-                  <p className="text-gray-700 leading-relaxed">{profile.bio}</p>
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="font-semibold text-gray-800 mb-2 text-sm">Hakkımda</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">{profile.bio}</p>
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-600 mb-1">Üyelik Durumu</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {profile.is_premium ? 'Premium' : 'Ücretsiz'}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-3">
+                  <p className="text-xs text-gray-600 mb-1">Üyelik</p>
+                  <p className="text-base font-semibold text-gray-800">
+                    {profile.is_premium ? '👑 Premium' : '🆓 Ücretsiz'}
                   </p>
                 </div>
-                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-600 mb-1">Günlük Teklif</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {profile.is_premium ? 'Sınırsız' : `${3 - profile.daily_offers_count} / 3`}
+                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-3">
+                  <p className="text-xs text-gray-600 mb-1">Teklif Hakkı</p>
+                  <p className="text-base font-semibold text-gray-800">
+                    {profile.is_premium ? 'Sınırsız' : `${getFreeOffersLimit(profile.id) - profile.free_offers_used} / ${getFreeOffersLimit(profile.id)}`}
                   </p>
                 </div>
               </div>
@@ -260,16 +263,16 @@ export default function Profile() {
 
       {!isEditing && (
         <>
-          <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="font-semibold text-gray-800 mb-4">Hesap Bilgileri</h3>
-            <div className="space-y-3 text-sm">
+          <div className="mt-4 bg-white rounded-xl shadow p-4">
+            <h3 className="font-semibold text-gray-800 mb-3 text-sm">Hesap Bilgileri</h3>
+            <div className="space-y-2 text-sm">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Üyelik Tarihi</span>
                 <span className="font-medium text-gray-800">
                   {new Date(profile.created_at).toLocaleDateString('tr-TR')}
                 </span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
+              <div className="flex justify-between py-2">
                 <span className="text-gray-600">Cinsiyet</span>
                 <span className="font-medium text-gray-800 capitalize">
                   {profile.gender}
@@ -278,24 +281,143 @@ export default function Profile() {
             </div>
           </div>
 
+          {/* Yardım ve Yasal Bölümü */}
+          <div className="mt-4 bg-white rounded-xl shadow overflow-hidden">
+            <h3 className="font-semibold text-gray-800 px-4 pt-4 pb-2 text-sm">Yardım & Destek</h3>
+            <div className="divide-y divide-gray-100">
+              <button 
+                onClick={() => onNavigate('faq')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <HelpCircle className="w-5 h-5 text-pink-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Sıkça Sorulan Sorular</p>
+                  <p className="text-xs text-gray-500">Merak ettikleriniz</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('help')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <Mail className="w-5 h-5 text-blue-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Yardım & İletişim</p>
+                  <p className="text-xs text-gray-500">Bize ulaşın</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('report')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <AlertCircle className="w-5 h-5 text-orange-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Bildir</p>
+                  <p className="text-xs text-gray-500">Sorun bildirin</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Yasal Bölüm */}
+          <div className="mt-4 bg-white rounded-xl shadow overflow-hidden">
+            <h3 className="font-semibold text-gray-800 px-4 pt-4 pb-2 text-sm">Yasal & Gizlilik</h3>
+            <div className="divide-y divide-gray-100">
+              <button 
+                onClick={() => onNavigate('privacy')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <Shield className="w-5 h-5 text-green-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Gizlilik Sözleşmesi</p>
+                  <p className="text-xs text-gray-500">Verileriniz güvende</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('terms')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <FileText className="w-5 h-5 text-purple-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Kullanıcı Sözleşmesi</p>
+                  <p className="text-xs text-gray-500">Kullanım koşulları</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('kvkk')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <Shield className="w-5 h-5 text-indigo-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">KVKK Aydınlatma Metni</p>
+                  <p className="text-xs text-gray-500">Kişisel verilerin korunması</p>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('cookies')}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <Cookie className="w-5 h-5 text-amber-500" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 text-sm">Çerez Politikası</p>
+                  <p className="text-xs text-gray-500">Çerez kullanımı hakkında</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
           {/* Çıkış Yap Butonu */}
-          <div className="mt-6">
+          <div className="mt-4">
             <button
-              onClick={() => {
-                showModal(
-                  'confirm',
-                  'Çıkış Yap',
-                  'Çıkış yapmak istediğinizden emin misiniz?',
-                  () => signOut()
-                );
-              }}
-              className="w-full py-4 bg-red-500 text-white rounded-2xl font-semibold shadow-lg hover:bg-red-600 transition-all flex items-center justify-center gap-2"
+              onClick={() => setShowLogoutConfirm(true)}
+              className="w-full py-3 bg-red-500 text-white rounded-xl font-semibold shadow hover:bg-red-600 transition-all flex items-center justify-center gap-2"
             >
               <LogOut className="w-5 h-5" />
               Çıkış Yap
             </button>
           </div>
         </>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogOut className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Çıkış Yap
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Çıkış yapmak istediğinizden emin misiniz?
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(false);
+                    signOut();
+                  }}
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                >
+                  Çıkış Yap
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
