@@ -39,6 +39,7 @@ Modern, Instagram tarzı bir sosyal aktivite platformu. Kullanıcılar etkinlik 
 
 - **Frontend**: React + TypeScript + Vite
 - **Styling**: Tailwind CSS
+- **Mobile**: Capacitor (iOS & Android)
 - **Backend**: Supabase
   - Authentication
   - PostgreSQL Database
@@ -94,8 +95,17 @@ supabase db push
 
 5. **Development server'ı başlat**
 ```bash
+# Web development
 npm run dev
+
+# Android app
+npm run android
+
+# iOS app (Mac gerekli)
+npm run ios
 ```
+
+📱 **Mobile uygulama kurulumu için:** [MOBILE_SETUP.md](./MOBILE_SETUP.md) dosyasına bakın.
 
 ## 📁 Proje Yapısı
 

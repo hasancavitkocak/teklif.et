@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ModalProvider } from './contexts/ModalContext';
 import { useNotifications } from './hooks/useNotifications';
+import { useCapacitor } from './hooks/useCapacitor';
+import { usePushNotifications } from './hooks/usePushNotifications';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
 import DiscoverOffers from './components/DiscoverOffers';
@@ -15,6 +17,8 @@ type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile';
 function AppContent() {
   const { user, loading } = useAuth();
   useNotifications(); // Initialize real-time notifications
+  useCapacitor(); // Initialize Capacitor
+  usePushNotifications(); // Initialize push notifications
   const [currentPage, setCurrentPage] = useState<Page>('discover');
 
   if (loading) {
