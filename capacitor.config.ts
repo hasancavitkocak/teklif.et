@@ -5,6 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Teklif.et',
   webDir: 'dist',
   server: {
+    // Live reload için - geliştirme sırasında aktif et
+    // url: 'http://192.168.1.X:5173', // Bilgisayarının IP'sini yaz
+    // cleartext: true,
     androidScheme: 'https',
     iosScheme: 'https'
   },
@@ -15,12 +18,13 @@ const config: CapacitorConfig = {
       showSpinner: false,
       androidSpinnerStyle: 'small',
       iosSpinnerStyle: 'small',
-      splashFullScreen: true,
-      splashImmersive: true
+      splashFullScreen: false,
+      splashImmersive: false
     },
     StatusBar: {
-      style: 'light',
-      backgroundColor: '#ec4899'
+      style: 'dark',
+      backgroundColor: '#ffffff',
+      overlaysWebView: false
     },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert']

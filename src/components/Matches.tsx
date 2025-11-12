@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Heart, MessageCircle, MapPin, Trash2, Ban, User } from 'lucide-react';
 import { supabase, Offer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -158,7 +158,7 @@ export default function Matches() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Eşleşmeler yükleniyor...</p>
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function Matches() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Heart className="w-16 h-16 text-pink-300 mx-auto mb-4" />
+          <Heart className="w-16 h-16 text-violet-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Henüz eşleşmeniz yok
           </h3>
@@ -234,10 +234,10 @@ export default function Matches() {
                     <img
                       src={match.matchedUser.photo_url}
                       alt={match.matchedUser.name}
-                      className="w-16 h-16 rounded-full object-cover group-hover:ring-4 group-hover:ring-pink-300 transition-all"
+                      className="w-16 h-16 rounded-full object-cover group-hover:ring-4 group-hover:ring-violet-300 transition-all"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-200 to-rose-200 flex items-center justify-center group-hover:ring-4 group-hover:ring-pink-300 transition-all">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-200 to-purple-200 flex items-center justify-center group-hover:ring-4 group-hover:ring-violet-300 transition-all">
                       <span className="text-white text-xl font-bold">
                         {match.matchedUser.name.charAt(0).toUpperCase()}
                       </span>
@@ -280,8 +280,8 @@ export default function Matches() {
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-pink-50 rounded-lg p-3 mb-3">
-                      <p className="text-sm text-pink-700">
+                    <div className="bg-violet-50 rounded-lg p-3 mb-3">
+                      <p className="text-sm text-violet-700">
                         🎉 Yeni eşleşme! İlk mesajı gönderin
                       </p>
                     </div>
@@ -293,11 +293,11 @@ export default function Matches() {
                     </span>
                     <div className="flex items-center gap-2">
                       {(match.unreadCount || 0) > 0 && (
-                        <span className="bg-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center">
+                        <span className="bg-violet-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center">
                           {match.unreadCount}
                         </span>
                       )}
-                      <MessageCircle className="w-5 h-5 text-pink-500" />
+                      <MessageCircle className="w-5 h-5 text-violet-500" />
                     </div>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import { Send } from 'lucide-react';
+﻿import { Send } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Help() {
@@ -55,7 +55,7 @@ export default function Help() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 placeholder="Ad Soyad"
               />
             </div>
@@ -69,7 +69,7 @@ export default function Help() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 placeholder="ornek@email.com"
               />
             </div>
@@ -83,7 +83,7 @@ export default function Help() {
               required
               value={formData.subject}
               onChange={(e) => setFormData({...formData, subject: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
             >
               <option value="">Konu seçin</option>
               <option value="technical">Teknik Sorun</option>
@@ -104,7 +104,7 @@ export default function Help() {
               value={formData.message}
               onChange={(e) => setFormData({...formData, message: e.target.value})}
               rows={6}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
               placeholder="Mesajınızı buraya yazın..."
             />
           </div>
@@ -112,7 +112,7 @@ export default function Help() {
           <button
             type="submit"
             disabled={sending}
-            className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Send className="w-5 h-5" />
             {sending ? 'Gönderiliyor...' : 'Mesajı Gönder'}

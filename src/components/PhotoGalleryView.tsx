@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -46,7 +46,7 @@ export default function PhotoGalleryView({ userId, userName }: PhotoGalleryViewP
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <Loader className="w-8 h-8 text-pink-500 animate-spin" />
+        <Loader className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
     );
   }
@@ -69,7 +69,7 @@ export default function PhotoGalleryView({ userId, userName }: PhotoGalleryViewP
       </div>
 
       {/* Main Photo Display */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-pink-200 to-rose-200">
+      <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-violet-200 to-purple-200">
         <img
           src={photos[currentIndex]}
           alt={`${userName} - Fotoğraf ${currentIndex + 1}`}
@@ -104,7 +104,7 @@ export default function PhotoGalleryView({ userId, userName }: PhotoGalleryViewP
               onClick={() => setCurrentIndex(index)}
               className={`h-2 rounded-full transition-all ${
                 index === currentIndex
-                  ? 'w-8 bg-pink-500'
+                  ? 'w-8 bg-violet-500'
                   : 'w-2 bg-gray-300 hover:bg-gray-400'
               }`}
             />
@@ -121,8 +121,8 @@ export default function PhotoGalleryView({ userId, userName }: PhotoGalleryViewP
               onClick={() => setCurrentIndex(index)}
               className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                 index === currentIndex
-                  ? 'border-pink-500 scale-110'
-                  : 'border-gray-200 hover:border-pink-300'
+                  ? 'border-violet-500 scale-110'
+                  : 'border-gray-200 hover:border-violet-300'
               }`}
             >
               <img

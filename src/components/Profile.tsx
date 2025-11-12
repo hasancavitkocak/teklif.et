@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Edit2, Save, X, LogOut, HelpCircle, Shield, FileText, Cookie, AlertCircle, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -89,7 +89,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Yükleniyor...</p>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-violet-500 text-white rounded-full font-medium hover:bg-violet-600 transition-colors"
           >
             <Edit2 className="w-4 h-4" />
             Düzenle
@@ -123,7 +123,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
 
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         {/* Compact header with profile photo */}
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6 flex items-center gap-4">
+        <div className="bg-gradient-to-r from-violet-500 to-purple-500 p-6 flex items-center gap-4">
           {profile.photo_url ? (
             <img
               src={profile.photo_url}
@@ -139,7 +139,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
             <h2 className="text-2xl font-bold text-white mb-1">
               {profile.name}, {profile.age}
             </h2>
-            <p className="text-pink-100">{profile.city}</p>
+            <p className="text-violet-100">{profile.city}</p>
           </div>
         </div>
 
@@ -168,7 +168,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 />
               </div>
 
@@ -182,7 +182,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                   onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 0 })}
                   min="18"
                   max="100"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 />
               </div>
 
@@ -193,7 +193,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                 <select
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 >
                   {turkishCities.map((city) => (
                     <option key={city} value={city}>{city}</option>
@@ -210,7 +210,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   rows={4}
                   placeholder="Kendinizden bahsedin..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
                 />
               </div>
 
@@ -226,7 +226,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   <Save className="w-5 h-5" />
                   {saving ? 'Kaydediliyor...' : 'Kaydet'}
@@ -243,13 +243,13 @@ export default function Profile({ onNavigate }: ProfileProps) {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-3">
+                <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-3">
                   <p className="text-xs text-gray-600 mb-1">Üyelik</p>
                   <p className="text-base font-semibold text-gray-800">
                     {profile.is_premium ? '👑 Premium' : '🆓 Ücretsiz'}
                   </p>
                 </div>
-                <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-3">
+                <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-3">
                   <p className="text-xs text-gray-600 mb-1">Teklif Hakkı</p>
                   <p className="text-base font-semibold text-gray-800">
                     {profile.is_premium ? 'Sınırsız' : `${getFreeOffersLimit(profile.id) - profile.free_offers_used} / ${getFreeOffersLimit(profile.id)}`}
@@ -289,7 +289,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                 onClick={() => onNavigate('faq')}
                 className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
               >
-                <HelpCircle className="w-5 h-5 text-pink-500" />
+                <HelpCircle className="w-5 h-5 text-violet-500" />
                 <div className="flex-1">
                   <p className="font-medium text-gray-800 text-sm">Sıkça Sorulan Sorular</p>
                   <p className="text-xs text-gray-500">Merak ettikleriniz</p>
@@ -410,7 +410,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                     setShowLogoutConfirm(false);
                     signOut();
                   }}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
                 >
                   Çıkış Yap
                 </button>

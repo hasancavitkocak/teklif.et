@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Flag, User, Clock, CheckCircle, XCircle, Eye, Loader2 } from 'lucide-react';
 
@@ -118,7 +118,7 @@ export default function Reports() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
       </div>
     );
   }
@@ -134,7 +134,7 @@ export default function Reports() {
               onClick={() => setFilter(f as any)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 filter === f
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -297,7 +297,7 @@ export default function Reports() {
                           setSelectedReport(report);
                           setAdminNotes(report.admin_notes || '');
                         }}
-                        className="text-pink-500 hover:text-pink-600 font-medium"
+                        className="text-violet-500 hover:text-violet-600 font-medium"
                       >
                         Detay
                       </button>
@@ -354,7 +354,7 @@ export default function Reports() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   placeholder="Notlarınızı buraya yazın..."
                 />
               </div>

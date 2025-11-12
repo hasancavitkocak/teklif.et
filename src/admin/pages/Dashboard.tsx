@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Users, FileText, Heart, Crown, TrendingUp, Activity } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import StatCard from '../components/StatCard';
@@ -75,7 +75,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -145,8 +145,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-            <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-              <Heart className="w-5 h-5 text-pink-600" />
+            <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
+              <Heart className="w-5 h-5 text-violet-600" />
             </div>
             <div className="flex-1">
               <p className="font-medium text-gray-800">Yeni eşleşme</p>

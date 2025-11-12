@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
 export default function Matches() {
@@ -27,7 +27,7 @@ export default function Matches() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" /></div>;
 
   return (
     <div>
@@ -45,7 +45,7 @@ export default function Matches() {
                   {new Date(match.created_at).toLocaleDateString('tr-TR')}
                 </p>
               </div>
-              <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">
+              <span className="px-3 py-1 bg-violet-100 text-violet-700 rounded-full text-sm">
                 Eşleşti
               </span>
             </div>

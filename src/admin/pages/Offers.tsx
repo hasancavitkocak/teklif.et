@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Search, Trash2, Eye } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -38,7 +38,7 @@ export default function Offers() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" /></div>;
+  if (loading) return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" /></div>;
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { MapPin, Heart, X, Sparkles, Filter, Settings } from 'lucide-react';
 import { supabase, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -244,7 +244,7 @@ export default function Discover() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Profiller yükleniyor...</p>
         </div>
       </div>
@@ -255,7 +255,7 @@ export default function Discover() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Sparkles className="w-16 h-16 text-pink-400 mx-auto mb-4" />
+          <Sparkles className="w-16 h-16 text-violet-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Şimdilik bu kadar!
           </h3>
@@ -267,7 +267,7 @@ export default function Discover() {
               setCurrentIndex(0);
               fetchProfiles();
             }}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-medium hover:shadow-lg transition-all"
+            className="px-6 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium hover:shadow-lg transition-all"
           >
             Yenile
           </button>
@@ -296,7 +296,7 @@ export default function Discover() {
         >
           <div className="bg-white rounded-full p-3 shadow-lg">
             <div 
-              className={`w-6 h-6 border-3 border-pink-500 border-t-transparent rounded-full ${
+              className={`w-6 h-6 border-3 border-violet-500 border-t-transparent rounded-full ${
                 refreshing ? 'animate-spin' : ''
               }`}
               style={{
@@ -310,7 +310,7 @@ export default function Discover() {
       {refreshing && (
         <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
           <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-medium text-gray-700">Yenileniyor...</span>
           </div>
         </div>
@@ -324,8 +324,8 @@ export default function Discover() {
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                 showFilters
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                  : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink-300 hover:bg-pink-50'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
+                  : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-violet-300 hover:bg-violet-50'
               }`}
             >
               <Filter className="w-4 h-4" />
@@ -333,7 +333,7 @@ export default function Discover() {
             </button>
             {!currentProfile?.is_premium && (
               <div className="text-sm text-gray-600">
-                Kalan: <span className="font-semibold text-pink-500">
+                Kalan: <span className="font-semibold text-violet-500">
                   {3 - (currentProfile?.daily_offers_count || 0)}
                 </span>
               </div>
@@ -351,8 +351,8 @@ export default function Discover() {
             }}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               filters.maxDistance === 10
-                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+                ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-violet-300'
             }`}
           >
             📍 Yakınlarımda (10km)
@@ -364,8 +364,8 @@ export default function Discover() {
             }}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               filters.maxDistance === 50
-                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+                ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-violet-300'
             }`}
           >
             🚗 Şehrimde (50km)
@@ -377,8 +377,8 @@ export default function Discover() {
             }}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               filters.maxDistance === 100
-                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+                ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-violet-300'
             }`}
           >
             🌍 Tüm Bölge (100km)
@@ -389,7 +389,7 @@ export default function Discover() {
       {showFilters && (
         <div className="mb-6 bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center">
               <Settings className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -439,7 +439,7 @@ export default function Discover() {
                       onClick={() => setFilters({...filters, gender: gender as any})}
                       className={`py-3 px-4 rounded-xl font-medium transition-all ${
                         filters.gender === gender
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                          ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -495,7 +495,7 @@ export default function Discover() {
                     fetchProfiles();
                     setShowFilters(false);
                   }}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-200"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-200"
                 >
                   Uygula
                 </button>
@@ -516,7 +516,7 @@ export default function Discover() {
       )}
 
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="relative h-96 bg-gradient-to-br from-pink-200 to-rose-200">
+        <div className="relative h-96 bg-gradient-to-br from-violet-200 to-purple-200">
           {currentCard.photo_url ? (
             <img
               src={currentCard.photo_url}
@@ -564,7 +564,7 @@ export default function Discover() {
           <button
             onClick={sendOffer}
             disabled={sending}
-            className="flex-1 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Heart className="w-6 h-6 fill-white" />
             {sending ? 'Gönderiliyor...' : 'Teklif Et'}

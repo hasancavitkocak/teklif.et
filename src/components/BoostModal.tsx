@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { X, Zap, Heart, Sparkles, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,7 +25,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
       duration: `${boostDuration} saat`,
       benefit: '3x daha fazla görünürlük',
       price: boostPrice / 100, // Convert to TRY
-      color: 'from-purple-500 to-pink-500',
+      color: 'from-purple-500 to-violet-500',
       description: `Profilin ${boostDuration} saat boyunca en üstte görünür`,
     },
     super_like: {
@@ -34,7 +34,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
       duration: 'Tek kullanım',
       benefit: 'Özel bildirim gönder',
       price: 19.90,
-      color: 'from-pink-500 to-rose-500',
+      color: 'from-violet-500 to-purple-500',
       description: 'Karşı tarafa özel bildirimle öne çık',
     },
   };
@@ -100,7 +100,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white p-6 flex items-center justify-between z-10 rounded-t-3xl">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-500 via-violet-500 to-purple-500 text-white p-6 flex items-center justify-between z-10 rounded-t-3xl">
           <div className="flex items-center gap-3">
             <Sparkles className="w-8 h-8" />
             <div>
@@ -165,12 +165,12 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
             onClick={() => setSelectedBoost('super_like')}
             className={`relative w-full p-5 rounded-2xl border-2 transition-all ${
               selectedBoost === 'super_like'
-                ? 'border-pink-500 bg-pink-50 shadow-lg'
-                : 'border-gray-200 bg-white hover:border-pink-300'
+                ? 'border-violet-500 bg-violet-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-violet-300'
             }`}
           >
             {selectedBoost === 'super_like' && (
-              <div className="absolute top-3 right-3 bg-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              <div className="absolute top-3 right-3 bg-violet-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                 ✓
               </div>
             )}
@@ -196,7 +196,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-pink-600">
+                  <span className="text-2xl font-bold text-violet-600">
                     ₺{boosts.super_like.price}
                   </span>
                   {profile && (profile.super_likes_remaining || 0) > 0 && (
@@ -230,7 +230,7 @@ export default function BoostModal({ onClose, onSuccess }: BoostModalProps) {
           <button
             onClick={handlePurchase}
             disabled={!selectedBoost || processing}
-            className="w-full py-5 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-5 bg-gradient-to-r from-purple-500 via-violet-500 to-purple-500 text-white rounded-xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {processing ? (
               <>

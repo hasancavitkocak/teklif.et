@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import AdminLayout from './AdminLayout';
 import Dashboard from './pages/Dashboard';
@@ -34,7 +34,7 @@ export default function AdminApp() {
               await refreshProfile();
               window.location.reload();
             }}
-            className="px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+            className="px-6 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors"
           >
             Profili Yenile
           </button>

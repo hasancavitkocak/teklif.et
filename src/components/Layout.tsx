@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+﻿import { ReactNode, useEffect, useState } from 'react';
 import { Heart, Search, Gift, Users, Crown, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -71,14 +71,14 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50">
       {isLegalPage ? (
         // Legal pages header with back button
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 py-4">
+        <header className="fixed top-0 left-0 right-0 md:sticky bg-white border-b border-gray-100 z-50 shadow-sm safe-top">
+          <div className="w-full px-4 py-4">
             <button
               onClick={() => onNavigate('profile')}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="font-medium">Geri Dön</span>
@@ -86,43 +86,50 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
           </div>
         </header>
       ) : (
-        // Normal header
-        <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        // Normal header - White background with colored text - FIXED for mobile
+        <header className="fixed top-0 left-0 right-0 md:sticky bg-white border-b border-gray-100 z-50 shadow-sm safe-top">
+          <div className="w-full mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Heart className="w-7 h-7 text-pink-500 fill-pink-500" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+              <Heart className="w-7 h-7 text-violet-500 fill-violet-500" />
+              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-violet-500 to-purple-500 bg-clip-text text-transparent">
                 Teklif.et
               </h1>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               {profile?.is_premium && (
-                <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  <Crown className="w-4 h-4" />
-                  Premium
+                <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
+                  <Crown className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Premium</span>
                 </div>
               )}
-              <span className="text-gray-700 font-medium hidden sm:inline">{profile?.name}</span>
+              <span className="text-gray-700 font-medium text-sm md:text-base hidden sm:inline truncate max-w-[120px]">{profile?.name}</span>
             </div>
           </div>
         </header>
       )}
 
-      <main className={`mx-auto px-4 py-6 ${isLegalPage ? 'max-w-full' : 'max-w-7xl'}`}>
+      <main className="w-full mx-auto px-4 py-6 pt-20 md:pt-6">
         {children}
       </main>
 
       {!isLegalPage && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50 pb-safe" style={{ borderTop: '1px solid #eaeaea' }}>
-          <div className="max-w-7xl mx-auto px-4">
+        <nav 
+          className="fixed bottom-0 left-0 right-0 bg-white shadow-lg pb-safe" 
+          style={{ 
+            borderTop: '1px solid #eaeaea',
+            zIndex: 40,
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))'
+          }}
+        >
+          <div className="w-full px-2 md:px-4">
             <div className="flex items-center justify-around py-3">
               <button
                 onClick={() => onNavigate('discover')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
                   currentPage === 'discover'
-                    ? 'text-pink-500'
-                    : 'text-gray-500 hover:text-pink-400'
+                    ? 'text-violet-500'
+                    : 'text-gray-500 hover:text-violet-400'
                 }`}
               >
                 <Search className="w-6 h-6" />
@@ -133,8 +140,8 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
                 onClick={() => onNavigate('offers')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
                   currentPage === 'offers'
-                    ? 'text-pink-500'
-                    : 'text-gray-500 hover:text-pink-400'
+                    ? 'text-violet-500'
+                    : 'text-gray-500 hover:text-violet-400'
                 }`}
               >
                 <Gift className="w-6 h-6" />
@@ -145,8 +152,8 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
                 onClick={() => onNavigate('matches')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors relative ${
                   currentPage === 'matches'
-                    ? 'text-pink-500'
-                    : 'text-gray-500 hover:text-pink-400'
+                    ? 'text-violet-500'
+                    : 'text-gray-500 hover:text-violet-400'
                 }`}
               >
                 <Users className="w-6 h-6" />
@@ -162,8 +169,8 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
                 onClick={() => onNavigate('premium')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
                   currentPage === 'premium'
-                    ? 'text-pink-500'
-                    : 'text-gray-500 hover:text-pink-400'
+                    ? 'text-violet-500'
+                    : 'text-gray-500 hover:text-violet-400'
                 }`}
               >
                 <Crown className="w-6 h-6" />
@@ -174,8 +181,8 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
                 onClick={() => onNavigate('profile')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
                   currentPage === 'profile'
-                    ? 'text-pink-500'
-                    : 'text-gray-500 hover:text-pink-400'
+                    ? 'text-violet-500'
+                    : 'text-gray-500 hover:text-violet-400'
                 }`}
               >
                 <User className="w-6 h-6" />

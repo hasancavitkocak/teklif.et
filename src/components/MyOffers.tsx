@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Calendar, MapPin, Users, Trash2, Eye } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -161,7 +161,7 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Teklifler yükleniyor...</p>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
   if (offers.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-20 h-20 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-4xl">📝</span>
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -200,10 +200,10 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
                 <img
                   src={profile.photo_url}
                   alt={profile.name}
-                  className="w-20 h-20 rounded-full object-cover border-4 border-pink-200"
+                  className="w-20 h-20 rounded-full object-cover border-4 border-violet-200"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-200 to-rose-200 flex items-center justify-center border-4 border-pink-200">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-200 to-purple-200 flex items-center justify-center border-4 border-violet-200">
                   <span className="text-white text-2xl font-bold">
                     {profile?.name.charAt(0).toUpperCase()}
                   </span>
@@ -229,22 +229,22 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 text-sm">
               <div className="flex items-center gap-2 text-gray-600">
-                <Calendar className="w-4 h-4 text-pink-500" />
+                <Calendar className="w-4 h-4 text-violet-500" />
                 <span>{formatDate(offer.event_date)}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
-                <MapPin className="w-4 h-4 text-pink-500" />
+                <MapPin className="w-4 h-4 text-violet-500" />
                 <span>{offer.city}{offer.district && `, ${offer.district}`}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
-                <Users className="w-4 h-4 text-pink-500" />
+                <Users className="w-4 h-4 text-violet-500" />
                 <span>
                   {offer.offer_type === 'birebir' ? 'Birebir' : `${offer.participant_count} kişi`}
                 </span>
               </div>
               {(offer.pendingRequestCount || 0) > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
+                  <span className="px-3 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold">
                     {offer.pendingRequestCount} yeni talep
                   </span>
                 </div>
@@ -263,7 +263,7 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
               <button
                 onClick={() => onViewRequests?.(offer.id)}
                 disabled={offer.status === 'completed'}
-                className="flex-1 py-2 px-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 px-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Eye className="w-4 h-4" />
                 {offer.status === 'completed' ? 'Tamamlandı' : 'Talepleri Gör'}
@@ -297,7 +297,7 @@ export default function MyOffers({ onViewRequests }: MyOffersProps) {
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
                 >
                   Sil
                 </button>

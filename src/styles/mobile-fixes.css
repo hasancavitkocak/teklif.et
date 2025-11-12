@@ -1,0 +1,163 @@
+/* Mobile-specific fixes for better UX */
+
+/* Bottom navigation height variable */
+:root {
+  --bottom-nav-height: 72px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --total-bottom-space: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+}
+
+/* Prevent zoom on input focus (iOS Safari) */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Fix for iOS Safari bottom bar */
+@supports (-webkit-touch-callout: none) {
+  .mobile-chat-input {
+    bottom: calc(var(--total-bottom-space) + 8px) !important;
+  }
+}
+
+/* Ensure chat input is always visible */
+@media screen and (max-width: 768px) {
+  /* Chat input should be above bottom nav */
+  .chat-input-container {
+    position: fixed !important;
+    bottom: 64px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: white !important;
+    border-top: 2px solid #f3f4f6 !important;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Messages should have space for input */
+  .chat-messages-container {
+    padding-bottom: 140px !important;
+  }
+}
+
+/* Prevent overscroll bounce */
+body {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for Android keyboard */
+@media screen and (max-width: 768px) {
+  .keyboard-visible {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* Smooth scrolling for messages */
+.messages-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better touch targets */
+@media (hover: none) and (pointer: coarse) {
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Fix for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+}
+
+/* Prevent text selection on buttons */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better scrollbar for mobile */
+@media screen and (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+}
+
+/* Fix for modal overflow on mobile */
+@media screen and (max-width: 768px) {
+  .modal-content {
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+}
+
+/* Prevent horizontal scroll */
+body, html {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+}
+
+#root {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Prevent any element from causing horizontal scroll */
+* {
+  max-width: 100%;
+}
+
+/* Fix for elements that might overflow */
+@media screen and (max-width: 768px) {
+  .container, 
+  .max-w-7xl, 
+  .max-w-6xl, 
+  .max-w-5xl, 
+  .max-w-4xl, 
+  .max-w-3xl, 
+  .max-w-2xl,
+  .max-w-xl {
+    max-width: 100vw !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Ensure padding doesn't cause overflow */
+  .px-4, .px-6, .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Fix for input zoom on iOS */
+@media screen and (max-width: 768px) {
+  input:focus,
+  textarea:focus,
+  select:focus {
+    font-size: 16px !important;
+  }
+}

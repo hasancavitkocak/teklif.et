@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Mail, Clock, CheckCircle, XCircle, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -117,7 +117,7 @@ export default function ContactMessages() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
       </div>
     );
   }
@@ -133,7 +133,7 @@ export default function ContactMessages() {
               onClick={() => setFilter(f as any)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 filter === f
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -261,7 +261,7 @@ export default function ContactMessages() {
                             updateStatus(message.id, 'read');
                           }
                         }}
-                        className="text-pink-500 hover:text-pink-600 font-medium"
+                        className="text-violet-500 hover:text-violet-600 font-medium"
                       >
                         Görüntüle
                       </button>
@@ -332,13 +332,13 @@ export default function ContactMessages() {
                     value={reply}
                     onChange={(e) => setReply(e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     placeholder="Yanıtınızı buraya yazın..."
                   />
                   <button
                     onClick={sendReply}
                     disabled={sending || !reply.trim()}
-                    className="mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
+                    className="mt-2 px-6 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" />
                     {sending ? 'Gönderiliyor...' : 'Yanıtla'}

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import mobile fixes */
+@import './styles/mobile-fixes.css';
+
 /* Mobile-specific styles */
 @layer base {
   /* Prevent text selection on mobile */
@@ -26,7 +29,19 @@
 
   /* Safe area for bottom (iOS notch & Android navigation) */
   .safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+  
+  /* Safe area for top */
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+  
+  /* Extra padding for Android navigation buttons */
+  @media screen and (max-width: 768px) {
+    .safe-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+    }
   }
 
   .pb-safe {

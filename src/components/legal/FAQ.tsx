@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
+﻿import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 
 const faqs = [
@@ -63,7 +63,7 @@ export default function FAQ() {
             >
               <span className="font-semibold text-gray-800 pr-4">{faq.question}</span>
               {openIndex === index ? (
-                <ChevronUp className="w-5 h-5 text-pink-500 flex-shrink-0" />
+                <ChevronUp className="w-5 h-5 text-violet-500 flex-shrink-0" />
               ) : (
                 <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
               )}
@@ -77,12 +77,12 @@ export default function FAQ() {
         ))}
       </div>
 
-      <div className="mt-8 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 border border-pink-100">
+      <div className="mt-8 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-6 border border-violet-100">
         <h3 className="font-semibold text-gray-800 mb-2">Sorunuz yanıtlanmadı mı?</h3>
         <p className="text-gray-600 text-sm mb-4">
           Bizimle iletişime geçmekten çekinmeyin. Size yardımcı olmaktan mutluluk duyarız.
         </p>
-        <button className="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-medium hover:shadow-lg transition-all">
+        <button className="px-6 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium hover:shadow-lg transition-all">
           İletişime Geç
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { X, Star, Loader, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -166,7 +166,7 @@ export default function PhotoGallery() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <Loader className="w-8 h-8 text-pink-500 animate-spin" />
+        <Loader className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
     );
   }
@@ -235,12 +235,12 @@ export default function PhotoGallery() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 hover:border-pink-400 hover:bg-pink-50 transition-all flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 hover:border-violet-400 hover:bg-violet-50 transition-all flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? (
               <>
-                <Loader className="w-8 h-8 text-pink-500 animate-spin" />
-                <span className="text-sm text-pink-600 font-medium">Yükleniyor...</span>
+                <Loader className="w-8 h-8 text-violet-500 animate-spin" />
+                <span className="text-sm text-violet-600 font-medium">Yükleniyor...</span>
               </>
             ) : (
               <>
@@ -256,7 +256,7 @@ export default function PhotoGallery() {
       {uploading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4">
-            <Loader className="w-16 h-16 text-pink-500 animate-spin" />
+            <Loader className="w-16 h-16 text-violet-500 animate-spin" />
             <div className="text-center">
               <p className="text-lg font-semibold text-gray-800">Fotoğraf Yükleniyor</p>
               <p className="text-sm text-gray-600">Lütfen bekleyin...</p>

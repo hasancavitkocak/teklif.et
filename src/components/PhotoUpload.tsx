@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -118,10 +118,10 @@ export default function PhotoUpload({ currentPhotoUrl, onUploadComplete }: Photo
           <img
             src={preview}
             alt="Profile"
-            className="w-32 h-32 rounded-full object-cover border-4 border-pink-200"
+            className="w-32 h-32 rounded-full object-cover border-4 border-violet-200"
           />
         ) : (
-          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-200 to-rose-200 flex items-center justify-center border-4 border-pink-200">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-200 to-purple-200 flex items-center justify-center border-4 border-violet-200">
             <Camera className="w-12 h-12 text-white" />
           </div>
         )}
@@ -154,7 +154,7 @@ export default function PhotoUpload({ currentPhotoUrl, onUploadComplete }: Photo
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
-        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Upload className="w-5 h-5" />
         {uploading ? 'Yükleniyor...' : preview ? 'Fotoğrafı Değiştir' : 'Fotoğraf Yükle'}
@@ -199,7 +199,7 @@ export default function PhotoUpload({ currentPhotoUrl, onUploadComplete }: Photo
                 </button>
                 <button
                   onClick={confirmRemove}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
                 >
                   Kaldır
                 </button>

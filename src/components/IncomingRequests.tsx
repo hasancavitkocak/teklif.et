@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Calendar, MapPin, Check, X, MessageCircle, User } from 'lucide-react';
 import { supabase, OfferRequest, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -150,7 +150,7 @@ export default function IncomingRequests({ onRequestHandled, onOpenChat }: Incom
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Talepler yükleniyor...</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function IncomingRequests({ onRequestHandled, onOpenChat }: Incom
   if (requests.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-20 h-20 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-4xl">📬</span>
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -207,10 +207,10 @@ export default function IncomingRequests({ onRequestHandled, onOpenChat }: Incom
                   <img
                     src={request.requester.photo_url}
                     alt={request.requester.name}
-                    className="w-16 h-16 rounded-full object-cover group-hover:ring-4 group-hover:ring-pink-300 transition-all"
+                    className="w-16 h-16 rounded-full object-cover group-hover:ring-4 group-hover:ring-violet-300 transition-all"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-200 to-rose-200 flex items-center justify-center group-hover:ring-4 group-hover:ring-pink-300 transition-all">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-200 to-purple-200 flex items-center justify-center group-hover:ring-4 group-hover:ring-violet-300 transition-all">
                     <span className="text-white text-xl font-bold">
                       {request.requester.name.charAt(0).toUpperCase()}
                     </span>
@@ -268,7 +268,7 @@ export default function IncomingRequests({ onRequestHandled, onOpenChat }: Incom
                 </button>
                 <button
                   onClick={() => handleRequest(request.id, 'accepted')}
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   <Check className="w-5 h-5" />
                   Kabul Et

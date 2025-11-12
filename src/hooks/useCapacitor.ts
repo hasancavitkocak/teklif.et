@@ -26,8 +26,13 @@ export function useCapacitor() {
 
       // Set status bar style
       if (Capacitor.isPluginAvailable('StatusBar')) {
-        await StatusBar.setStyle({ style: Style.Light });
-        await StatusBar.setBackgroundColor({ color: '#ec4899' });
+        // Show status bar (don't hide it)
+        await StatusBar.show();
+        // Dark = BLACK text/icons (for white backgrounds)
+        await StatusBar.setStyle({ style: Style.Dark });
+        // White background
+        await StatusBar.setBackgroundColor({ color: '#ffffff' });
+        await StatusBar.setOverlaysWebView({ overlay: false });
       }
 
       // Handle keyboard

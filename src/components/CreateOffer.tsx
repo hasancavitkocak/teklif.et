@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Calendar, MapPin, Users, Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -117,7 +117,7 @@ export default function CreateOffer({ onNavigate }: Props) {
                     setSuccess(false);
                     onNavigate('discover');
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-5 h-5" />
                   Keşfet Sayfasına Git
@@ -164,7 +164,7 @@ export default function CreateOffer({ onNavigate }: Props) {
             value={formData.title}
             onChange={(e) => handleChange('title', e.target.value)}
             placeholder="Örn: Bu akşam kahve içelim ☕"
-            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all"
             required
             maxLength={100}
           />
@@ -179,7 +179,7 @@ export default function CreateOffer({ onNavigate }: Props) {
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Etkinlik hakkında detaylı bilgi verin..."
-            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all resize-none"
+            className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all resize-none"
             rows={4}
             required
             maxLength={500}
@@ -202,7 +202,7 @@ export default function CreateOffer({ onNavigate }: Props) {
                 onClick={() => handleChange('category', cat.value)}
                 className={`p-4 rounded-xl font-semibold transition-all text-base ${
                   formData.category === cat.value
-                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -225,7 +225,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               value={formData.city}
               onChange={(e) => handleChange('city', e.target.value)}
               placeholder="İstanbul"
-              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all"
               required
             />
           </div>
@@ -238,7 +238,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               value={formData.district}
               onChange={(e) => handleChange('district', e.target.value)}
               placeholder="Kadıköy"
-              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all"
             />
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               value={formData.event_date}
               onChange={(e) => handleChange('event_date', e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all"
               required
             />
           </div>
@@ -267,7 +267,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               type="time"
               value={formData.event_time}
               onChange={(e) => handleChange('event_time', e.target.value)}
-              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-4 focus:ring-pink-100 outline-none transition-all"
+              className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition-all"
               required
             />
           </div>
@@ -287,7 +287,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               }}
               className={`p-5 rounded-xl font-semibold transition-all text-base ${
                 formData.offer_type === 'birebir'
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -299,7 +299,7 @@ export default function CreateOffer({ onNavigate }: Props) {
               onClick={() => handleChange('offer_type', 'grup')}
               className={`p-5 rounded-xl font-semibold transition-all text-base ${
                 formData.offer_type === 'grup'
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -335,7 +335,7 @@ export default function CreateOffer({ onNavigate }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-5 text-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="w-full py-5 text-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           {loading ? 'Oluşturuluyor...' : '🎉 Talebimi Yayınla'}
         </button>

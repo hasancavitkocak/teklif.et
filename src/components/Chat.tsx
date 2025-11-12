@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+﻿import { useEffect, useState, useRef } from 'react';
 import { ArrowLeft, Send, Heart, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -163,7 +163,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Mesajlar yükleniyor...</p>
         </div>
       </div>
@@ -171,9 +171,9 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
   }
 
   return (
-    <div className="fixed inset-0 md:relative md:max-w-2xl md:mx-auto md:h-[calc(100vh-140px)] flex flex-col bg-white md:shadow-2xl z-50">
+    <div className="fixed inset-0 md:relative md:h-[calc(100vh-140px)] md:max-w-2xl md:mx-auto flex flex-col bg-white md:shadow-2xl md:rounded-2xl z-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white p-4 md:p-6 flex items-center gap-3 md:gap-4 shadow-lg flex-shrink-0">
+      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 text-white p-4 md:p-6 flex items-center gap-3 md:gap-4 shadow-lg flex-shrink-0">
         <button
           onClick={onBack}
           className="p-3 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-105"
@@ -206,7 +206,7 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
             <h3 className="font-bold text-white text-lg">
               {matchedUser.name}, {matchedUser.age}
             </h3>
-            <p className="text-sm text-pink-100 flex items-center gap-1">
+            <p className="text-sm text-violet-100 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
               {matchedUser.city}
             </p>
@@ -218,11 +218,11 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-40 space-y-4 bg-gradient-to-b from-pink-50/50 via-white to-rose-50/30 overscroll-contain">
+      {/* Messages - Scrollable area */}
+      <div className="messages-container flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gradient-to-b from-violet-50/50 via-white to-purple-50/30">
         {messages.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
               <Heart className="w-10 h-10 text-white fill-white" />
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
@@ -261,13 +261,13 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
                       <div
                         className={`px-4 py-3 rounded-2xl shadow-lg ${
                           isOwn
-                            ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-br-sm'
+                            ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-br-sm'
                             : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'
                         }`}
                       >
                         <p className="text-sm leading-relaxed">{message.content}</p>
                         <p className={`text-xs mt-1 ${
-                          isOwn ? 'text-pink-100' : 'text-gray-400'
+                          isOwn ? 'text-violet-100' : 'text-gray-400'
                         }`}>
                           {formatTime(message.created_at)}
                         </p>
@@ -282,29 +282,32 @@ export default function Chat({ matchedUser, onBack }: ChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input - Fixed above bottom navigation */}
-      <div className="fixed bottom-16 left-0 right-0 md:sticky md:bottom-0 bg-white px-4 pt-4 pb-3 md:pb-4 flex-shrink-0 z-40">
-        <form onSubmit={sendMessage} className="flex gap-3 items-center mb-3">
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Mesaj yazın..."
-              className="w-full px-4 py-3 pr-12 border-2 rounded-[20px] focus:ring-2 focus:ring-pink-100 outline-none transition-all bg-white text-gray-800 placeholder-gray-400"
-              style={{ borderColor: '#ff99cc' }}
-              disabled={sending}
-              autoComplete="off"
-              inputMode="text"
-            />
-            <button
-              type="submit"
-              disabled={!newMessage.trim() || sending}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
+      {/* Message Input - Fixed at bottom, NO SCROLL */}
+      <div 
+        className="flex-shrink-0 bg-white border-t-2 border-gray-200 px-3 shadow-2xl"
+        style={{ 
+          paddingTop: '12px',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))'
+        }}
+      >
+        <form onSubmit={sendMessage} className="flex gap-2 items-center w-full max-w-2xl mx-auto mb-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Mesaj yazın..."
+            className="flex-1 px-4 py-3 text-base border-2 border-violet-300 rounded-full focus:ring-2 focus:ring-violet-400 focus:border-violet-500 outline-none bg-white text-gray-900 placeholder-gray-500"
+            disabled={sending}
+            autoComplete="off"
+            style={{ fontSize: '16px' }}
+          />
+          <button
+            type="submit"
+            disabled={!newMessage.trim() || sending}
+            className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </form>
       </div>
     </div>

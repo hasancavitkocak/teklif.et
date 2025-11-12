@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Search, Crown, Trash2, Eye, X, Mail, Calendar, MapPin, Heart, MessageSquare } from 'lucide-react';
 import { supabase, Profile } from '../../lib/supabase';
 
@@ -126,7 +126,7 @@ export default function Users() {
   );
 
   if (loading) {
-    return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" /></div>;
+    return <div className="flex justify-center py-20"><div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" /></div>;
   }
 
   return (
@@ -146,7 +146,7 @@ export default function Users() {
               placeholder="Kullanıcı ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200 focus:border-pink-400 outline-none"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-200 focus:border-violet-400 outline-none"
             />
           </div>
           <div className="flex gap-2">
@@ -156,7 +156,7 @@ export default function Users() {
                 onClick={() => setFilterPremium(filter)}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   filterPremium === filter
-                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white'
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -188,7 +188,7 @@ export default function Users() {
                       {user.photo_url ? (
                         <img src={user.photo_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
+                        <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 font-bold">
                           {user.name.charAt(0)}
                         </div>
                       )}
@@ -274,7 +274,7 @@ export default function Users() {
                     className="w-32 h-32 rounded-2xl object-cover"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-2xl bg-pink-100 flex items-center justify-center text-pink-600 text-4xl font-bold">
+                  <div className="w-32 h-32 rounded-2xl bg-violet-100 flex items-center justify-center text-violet-600 text-4xl font-bold">
                     {selectedUser.name.charAt(0)}
                   </div>
                 )}
@@ -345,12 +345,12 @@ export default function Users() {
                       </div>
                       <p className="text-2xl font-bold text-green-800">{userStats.total_offers_received}</p>
                     </div>
-                    <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4">
+                    <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Heart className="w-5 h-5 text-pink-600" />
-                        <span className="text-sm text-pink-700 font-medium">Eşleşme</span>
+                        <Heart className="w-5 h-5 text-violet-600" />
+                        <span className="text-sm text-violet-700 font-medium">Eşleşme</span>
                       </div>
-                      <p className="text-2xl font-bold text-pink-800">{userStats.total_matches}</p>
+                      <p className="text-2xl font-bold text-violet-800">{userStats.total_matches}</p>
                     </div>
                     <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">

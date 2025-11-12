@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Calendar, MapPin, Users } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -131,7 +131,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
@@ -157,7 +157,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   onClick={() => setFormData({ ...formData, category: cat.value as ActivityOffer['category'] })}
                   className={`p-4 rounded-xl font-semibold transition-all text-sm ${
                     formData.category === cat.value
-                      ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -188,7 +188,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Örn: Bu akşam kahve içelim"
-                className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
                 maxLength={100}
               />
             </div>
@@ -201,7 +201,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Etkinlik hakkında detaylı bilgi..."
-                className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all resize-none"
+                className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all resize-none"
                 rows={3}
                 maxLength={500}
               />
@@ -233,7 +233,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   value={formData.event_date}
                   onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-3 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  className="w-full px-3 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
                   style={{ colorScheme: 'light' }}
                 />
               </div>
@@ -245,7 +245,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   type="time"
                   value={formData.event_time}
                   onChange={(e) => setFormData({ ...formData, event_time: e.target.value })}
-                  className="w-full px-3 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  className="w-full px-3 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
                   style={{ colorScheme: 'light' }}
                 />
               </div>
@@ -262,7 +262,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   placeholder="İstanbul"
-                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
                 />
               </div>
               <div>
@@ -274,7 +274,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   value={formData.district}
                   onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                   placeholder="Kadıköy"
-                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
                 />
               </div>
             </div>
@@ -301,7 +301,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   onClick={() => setFormData({ ...formData, offer_type: 'birebir', participant_count: 2 })}
                   className={`p-3 rounded-xl font-semibold transition-all text-sm ${
                     formData.offer_type === 'birebir'
-                      ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -313,7 +313,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                   onClick={() => setFormData({ ...formData, offer_type: 'grup' })}
                   className={`p-3 rounded-xl font-semibold transition-all text-sm ${
                     formData.offer_type === 'grup'
-                      ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -340,7 +340,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
             )}
 
             {/* Summary */}
-            <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-4 border-2 border-pink-200">
+            <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-4 border-2 border-violet-200">
               <h3 className="font-bold text-gray-800 mb-2 text-sm">Özet</h3>
               <div className="space-y-1 text-xs">
                 <p><strong>Kategori:</strong> {categories.find(c => c.value === formData.category)?.label}</p>
@@ -370,7 +370,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
           <button
             onClick={handleNext}
             disabled={!canProceed()}
-            className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             İleri
             <ArrowRight className="w-4 h-4" />

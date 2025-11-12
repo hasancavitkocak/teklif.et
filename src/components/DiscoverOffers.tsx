@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { MapPin, Calendar, Users, Heart, Filter, Zap, Send, CheckCircle, ArrowRight, Plus } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -195,7 +195,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Teklifler yükleniyor...</p>
         </div>
       </div>
@@ -220,7 +220,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         >
           <div className="bg-white rounded-full p-3 shadow-lg">
             <div 
-              className={`w-6 h-6 border-3 border-pink-500 border-t-transparent rounded-full ${
+              className={`w-6 h-6 border-3 border-violet-500 border-t-transparent rounded-full ${
                 refreshing ? 'animate-spin' : ''
               }`}
               style={{
@@ -234,7 +234,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       {refreshing && (
         <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
           <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-medium text-gray-700">Yenileniyor...</span>
           </div>
         </div>
@@ -249,14 +249,14 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => setShowCreateOffer(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             Talep Oluştur
           </button>
           <button
             onClick={() => setShowBoostModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
           >
             <Zap className="w-4 h-4" />
             Boost
@@ -265,8 +265,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
               showFilters
-                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink-300'
+                ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
+                : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-violet-300'
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -291,7 +291,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                     setFilters({ ...filters, city: '' });
                   }
                 }}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none"
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
               >
                 <option value="my_city">Şehrim ({profile?.city})</option>
                 <option value="all">Tüm Türkiye</option>
@@ -303,7 +303,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                   value={filters.city}
                   onChange={(e) => setFilters({ ...filters, city: e.target.value })}
                   placeholder="Şehir adı girin..."
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none mt-2"
+                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none mt-2"
                 />
               )}
             </div>
@@ -312,7 +312,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               <select
                 value={filters.category}
                 onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none"
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
               >
                 <option value="all">Tümü</option>
                 <option value="kahve">☕ Kahve</option>
@@ -329,7 +329,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               <select
                 value={filters.offerType}
                 onChange={(e) => setFilters({ ...filters, offerType: e.target.value as any })}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 outline-none"
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
               >
                 <option value="all">Tümü</option>
                 <option value="birebir">Birebir</option>
@@ -339,7 +339,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
           </div>
           <button
             onClick={fetchOffers}
-            className="mt-4 w-full py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+            className="mt-4 w-full py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             Filtreleri Uygula
           </button>
@@ -348,7 +348,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
       {offers.length === 0 ? (
         <div className="text-center py-20">
-          <Heart className="w-16 h-16 text-pink-300 mx-auto mb-4" />
+          <Heart className="w-16 h-16 text-violet-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Henüz talep yok
           </h3>
@@ -365,7 +365,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             >
               {/* Profile Header - Prominent */}
               <div 
-                className="relative h-48 bg-gradient-to-br from-pink-200 to-rose-200 cursor-pointer"
+                className="relative h-48 bg-gradient-to-br from-violet-200 to-purple-200 cursor-pointer"
                 onClick={() => setSelectedProfile(offer.creator)}
               >
                 {offer.creator.photo_url ? (
@@ -408,7 +408,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
                 {/* Boost badge - positioned at top right to not overlap profile info */}
                 {offer.creator.is_boosted && offer.creator.boost_expires_at && new Date(offer.creator.boost_expires_at) > new Date() && (
-                  <div className="absolute top-14 right-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-xs font-bold flex items-center gap-1 shadow-lg animate-pulse">
+                  <div className="absolute top-14 right-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full text-xs font-bold flex items-center gap-1 shadow-lg animate-pulse">
                     <Zap className="w-3 h-3" />
                     BOOST
                   </div>
@@ -432,16 +432,16 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 {/* Details */}
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="w-4 h-4 text-pink-500" />
+                    <Calendar className="w-4 h-4 text-violet-500" />
                     <span>{formatDate(offer.event_date)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4 text-pink-500" />
+                    <MapPin className="w-4 h-4 text-violet-500" />
                     <span>{offer.city}{offer.district && `, ${offer.district}`}</span>
                   </div>
                   {offer.offer_type === 'grup' && (
                     <div className="flex items-center gap-2 text-gray-600">
-                      <Users className="w-4 h-4 text-pink-500" />
+                      <Users className="w-4 h-4 text-violet-500" />
                       <span>{offer.participant_count} kişi</span>
                     </div>
                   )}
@@ -453,7 +453,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                     e.stopPropagation();
                     setSelectedOffer(offer);
                   }}
-                  className="mt-4 w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="mt-4 w-full py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
                   Teklif Gönder
@@ -485,7 +485,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                     setShowOfferCreatedPopup(false);
                     onNavigate?.('offers');
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   Taleplerime Git
                   <ArrowRight className="w-5 h-5" />
@@ -523,7 +523,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                     setShowSuccessPopup(false);
                     onNavigate?.('offers');
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   Gönderilen Tekliflerime Git
                   <ArrowRight className="w-5 h-5" />
@@ -567,7 +567,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       {showCreateOffer && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
           <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="bg-gradient-to-br from-pink-50 via-white to-rose-50 rounded-3xl shadow-2xl max-w-2xl w-full my-8">
+            <div className="bg-gradient-to-br from-violet-50 via-white to-purple-50 rounded-3xl shadow-2xl max-w-2xl w-full my-8">
               <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 rounded-t-3xl flex items-center justify-between z-10">
                 <h2 className="text-xl font-bold text-gray-800">Yeni Talep Oluştur</h2>
                 <button

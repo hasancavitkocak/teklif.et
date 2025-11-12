@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Save, Loader2, CheckCircle, Crown } from 'lucide-react';
@@ -98,7 +98,7 @@ export default function PremiumSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function PremiumSettings() {
         <button
           onClick={saveSettings}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -152,7 +152,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">7 gün geçerli, 10 teklif hakkı</p>
             </div>
@@ -173,7 +173,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">7 gün geçerli, 20 teklif hakkı</p>
             </div>
@@ -194,7 +194,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">30 gün geçerli, sınırsız teklif</p>
             </div>
@@ -215,7 +215,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">365 gün geçerli, sınırsız teklif</p>
             </div>
@@ -243,7 +243,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                className="w-5 h-5 text-violet-500 rounded focus:ring-violet-500"
               />
             </div>
 
@@ -306,7 +306,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                className="w-5 h-5 text-violet-500 rounded focus:ring-violet-500"
               />
             </div>
 
@@ -327,7 +327,7 @@ export default function PremiumSettings() {
                     },
                   })
                 }
-                className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                className="w-5 h-5 text-violet-500 rounded focus:ring-violet-500"
               />
             </div>
           </div>
@@ -339,24 +339,24 @@ export default function PremiumSettings() {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white rounded-xl p-4 border-2 border-gray-200">
               <h4 className="font-bold text-gray-800 mb-2">Haftalık 10</h4>
-              <p className="text-3xl font-bold text-pink-600 mb-2">
+              <p className="text-3xl font-bold text-violet-600 mb-2">
                 ₺{settings.premium_weekly_10_price.amount}
               </p>
               <p className="text-sm text-gray-600">10 teklif / 7 gün</p>
             </div>
-            <div className="bg-white rounded-xl p-4 border-2 border-pink-500">
+            <div className="bg-white rounded-xl p-4 border-2 border-violet-500">
               <div className="text-xs bg-green-500 text-white px-2 py-1 rounded-full inline-block mb-2">
                 En Popüler
               </div>
               <h4 className="font-bold text-gray-800 mb-2">Haftalık 20</h4>
-              <p className="text-3xl font-bold text-pink-600 mb-2">
+              <p className="text-3xl font-bold text-violet-600 mb-2">
                 ₺{settings.premium_weekly_20_price.amount}
               </p>
               <p className="text-sm text-gray-600">20 teklif / 7 gün</p>
             </div>
             <div className="bg-white rounded-xl p-4 border-2 border-gray-200">
               <h4 className="font-bold text-gray-800 mb-2">Aylık Sınırsız</h4>
-              <p className="text-3xl font-bold text-pink-600 mb-2">
+              <p className="text-3xl font-bold text-violet-600 mb-2">
                 ₺{settings.premium_monthly_price.amount}
               </p>
               <p className="text-sm text-gray-600">Sınırsız / 30 gün</p>

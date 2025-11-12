@@ -4,12 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
+    "dev:local": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "android": "npm run build && npx cap sync android && npx cap open android",
+    "android:run": "npm run build && npx cap sync android && npx cap run android",
+    "android:dev": "npm run build && npx cap sync android",
     "ios": "npm run build && npx cap sync ios && npx cap open ios",
     "sync": "npm run build && npx cap sync",
     "cap:update": "npm run build && npx cap sync && npx cap update"

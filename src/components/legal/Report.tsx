@@ -1,4 +1,4 @@
-import { AlertCircle, Send, Shield } from 'lucide-react';
+﻿import { AlertCircle, Send, Shield } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Report() {
@@ -65,7 +65,7 @@ export default function Report() {
               required
               value={formData.reportType}
               onChange={(e) => setFormData({...formData, reportType: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
             >
               <option value="">Seçiniz</option>
               <option value="harassment">Taciz veya Zorbalık</option>
@@ -88,7 +88,7 @@ export default function Report() {
               type="text"
               value={formData.reportedUser}
               onChange={(e) => setFormData({...formData, reportedUser: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
               placeholder="Kullanıcı adı veya profil linki"
             />
             <p className="text-xs text-gray-500 mt-2">
@@ -105,7 +105,7 @@ export default function Report() {
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               rows={6}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
               placeholder="Lütfen durumu detaylı bir şekilde açıklayın. Ne oldu? Ne zaman oldu? Hangi davranışlar sizi rahatsız etti?"
             />
             <p className="text-xs text-gray-500 mt-2">
@@ -121,7 +121,7 @@ export default function Report() {
               value={formData.evidence}
               onChange={(e) => setFormData({...formData, evidence: e.target.value})}
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
               placeholder="Ekran görüntüsü linki veya ek bilgiler"
             />
             <p className="text-xs text-gray-500 mt-2">
@@ -147,7 +147,7 @@ export default function Report() {
       </div>
 
       <div className="mt-8 grid md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-6 border border-red-100">
+        <div className="bg-gradient-to-br from-red-50 to-purple-50 rounded-2xl p-6 border border-red-100">
           <h3 className="font-semibold text-gray-800 mb-3">🚨 Acil Durum</h3>
           <p className="text-sm text-gray-600 mb-4">
             Fiziksel tehlike altındaysanız veya acil yardıma ihtiyacınız varsa:

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+﻿import { createContext, useContext, useState, ReactNode } from 'react';
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 
 type ModalType = 'success' | 'error' | 'warning' | 'confirm';
@@ -67,7 +67,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
       case 'success':
         return 'from-green-500 to-emerald-500';
       case 'error':
-        return 'from-red-500 to-rose-500';
+        return 'from-red-500 to-purple-500';
       case 'warning':
       case 'confirm':
         return 'from-amber-500 to-orange-500';

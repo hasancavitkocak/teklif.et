@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Save, Loader2, CheckCircle } from 'lucide-react';
@@ -78,7 +78,7 @@ export default function Settings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
       </div>
     );
   }
@@ -90,7 +90,7 @@ export default function Settings() {
         <button
           onClick={saveSettings}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -121,7 +121,7 @@ export default function Settings() {
                     daily_free_offers: { limit: parseInt(e.target.value) },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function Settings() {
                     super_like_daily_limit: { limit: parseInt(e.target.value) },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function Settings() {
                     boost_duration: { hours: parseInt(e.target.value) },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -183,7 +183,7 @@ export default function Settings() {
                     },
                   })
                 }
-                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
           </div>

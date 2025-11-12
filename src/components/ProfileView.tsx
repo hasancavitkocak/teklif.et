@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Calendar, Heart, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Profile } from '../lib/supabase';
 import { supabase } from '../lib/supabase';
@@ -115,7 +115,7 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
 
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Profile Photo Gallery */}
-        <div className="relative h-96 bg-gradient-to-br from-pink-200 to-rose-200">
+        <div className="relative h-96 bg-gradient-to-br from-violet-200 to-purple-200">
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-white text-2xl">Yükleniyor...</div>
@@ -191,7 +191,7 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
           {profile.bio && (
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" />
+                <Heart className="w-5 h-5 text-violet-500" />
                 Hakkında
               </h3>
               <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4">
@@ -202,8 +202,8 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
 
           {/* Details */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-pink-50 rounded-xl p-4">
-              <p className="text-sm text-pink-600 font-semibold mb-1">Yaş</p>
+            <div className="bg-violet-50 rounded-xl p-4">
+              <p className="text-sm text-violet-600 font-semibold mb-1">Yaş</p>
               <p className="text-2xl font-bold text-gray-800">{profile.age}</p>
             </div>
             <div className="bg-purple-50 rounded-xl p-4">
@@ -224,7 +224,7 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
                 {profile.interests.map((interest, index) => (
                   <span
                     key={index}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-700 rounded-full text-sm font-semibold"
+                    className="px-4 py-2 bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 rounded-full text-sm font-semibold"
                   >
                     {interest}
                   </span>
@@ -253,7 +253,7 @@ export default function ProfileView({ profile, onBack, onMessage, showMessageBut
             <button
               onClick={handleMessageClick}
               disabled={sendingMessage}
-              className="mt-6 w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-6 w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MessageCircle className="w-5 h-5" />
               {sendingMessage ? 'Açılıyor...' : 'Mesaj Gönder'}

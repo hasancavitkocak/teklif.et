@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart } from 'lucide-react';
 
@@ -52,12 +52,12 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Heart className="w-8 h-8 text-pink-500 fill-pink-500" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+            <Heart className="w-8 h-8 text-violet-500 fill-violet-500" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-500 to-purple-500 bg-clip-text text-transparent">
               Teklif.et
             </h1>
           </div>
@@ -70,7 +70,7 @@ export default function Auth() {
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 px-4 rounded-full font-medium transition-all ${
                 isLogin
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-600'
               }`}
             >
@@ -80,7 +80,7 @@ export default function Auth() {
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-2 px-4 rounded-full font-medium transition-all ${
                 !isLogin
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-600'
               }`}
             >
@@ -96,7 +96,7 @@ export default function Auth() {
                   placeholder="Adınız"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                   required
                 />
                 <input
@@ -106,13 +106,13 @@ export default function Auth() {
                   onChange={(e) => setAge(e.target.value)}
                   min="18"
                   max="100"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                   required
                 />
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as 'erkek' | 'kadın' | 'diğer')}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 >
                   <option value="erkek">Erkek</option>
                   <option value="kadın">Kadın</option>
@@ -121,7 +121,7 @@ export default function Auth() {
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                 >
                   {turkishCities.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -132,7 +132,7 @@ export default function Auth() {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
                 />
               </>
             )}
@@ -142,7 +142,7 @@ export default function Auth() {
               placeholder="E-posta"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
               required
             />
             <input
@@ -150,7 +150,7 @@ export default function Auth() {
               placeholder="Şifre"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
               required
             />
 
@@ -163,7 +163,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
             </button>

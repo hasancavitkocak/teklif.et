@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { X, Send, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -174,10 +174,10 @@ export default function OfferRequestModal({ offer, onClose, onSuccess }: Props) 
             </p>
             
             <div className="space-y-3 mb-6">
-              <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-4 text-left border-2 border-pink-200">
+              <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-4 text-left border-2 border-violet-200">
                 <p className="font-semibold text-gray-800 mb-1">10 Teklif Paketi</p>
                 <p className="text-sm text-gray-600 mb-2">Süresiz kullanım</p>
-                <p className="text-2xl font-bold text-pink-600">500 TL</p>
+                <p className="text-2xl font-bold text-violet-600">500 TL</p>
               </div>
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 text-left border-2 border-green-300">
                 <div className="flex items-center justify-between mb-1">
@@ -206,7 +206,7 @@ export default function OfferRequestModal({ offer, onClose, onSuccess }: Props) 
                   // TODO: Navigate to packages page
                   alert('Paket satın alma sayfası yakında eklenecek!');
                 }}
-                className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
               >
                 Paket Al
               </button>
@@ -221,7 +221,7 @@ export default function OfferRequestModal({ offer, onClose, onSuccess }: Props) 
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white p-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-violet-500 to-purple-500 text-white p-4 flex items-center justify-between">
           <h3 className="text-lg font-bold">Teklif Gönder</h3>
           <button
             onClick={onClose}
@@ -268,7 +268,7 @@ export default function OfferRequestModal({ offer, onClose, onSuccess }: Props) 
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="gidelim mi?"
-              className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all resize-none text-sm"
+              className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all resize-none text-sm"
               rows={3}
               maxLength={300}
             />
@@ -292,7 +292,7 @@ export default function OfferRequestModal({ offer, onClose, onSuccess }: Props) 
             type="submit"
             form="offer-form"
             disabled={loading}
-            className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <Send className="w-5 h-5" />
             {loading ? 'Gönderiliyor...' : 'Teklif Gönder'}

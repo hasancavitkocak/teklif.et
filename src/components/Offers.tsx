@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import MyOffers from './MyOffers';
@@ -61,7 +61,7 @@ export default function Offers() {
           onClick={() => setActiveTab('my-offers')}
           className={`py-2.5 px-2 rounded-xl font-semibold transition-all text-sm ${
             activeTab === 'my-offers'
-              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+              ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
               : 'text-gray-600 hover:bg-gray-50'
           }`}
         >
@@ -71,7 +71,7 @@ export default function Offers() {
           onClick={() => setActiveTab('requests')}
           className={`relative py-2.5 px-2 rounded-xl font-semibold transition-all text-sm ${
             activeTab === 'requests'
-              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+              ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
               : 'text-gray-600 hover:bg-gray-50'
           }`}
         >
@@ -86,7 +86,7 @@ export default function Offers() {
           onClick={() => setActiveTab('sent-offers')}
           className={`py-2.5 px-2 rounded-xl font-semibold transition-all text-sm ${
             activeTab === 'sent-offers'
-              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+              ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
               : 'text-gray-600 hover:bg-gray-50'
           }`}
         >

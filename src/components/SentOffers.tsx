@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Calendar, MapPin, Clock, User } from 'lucide-react';
 import { supabase, OfferRequest, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -81,7 +81,7 @@ export default function SentOffers() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Teklifler yükleniyor...</p>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function SentOffers() {
   if (sentOffers.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-20 h-20 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-4xl">📤</span>
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -125,7 +125,7 @@ export default function SentOffers() {
               
               <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4 text-pink-500" />
+                  <Calendar className="w-4 h-4 text-violet-500" />
                   {request.offer?.event_date && new Date(request.offer.event_date).toLocaleDateString('tr-TR', {
                     day: 'numeric',
                     month: 'long',
@@ -134,7 +134,7 @@ export default function SentOffers() {
                   })}
                 </div>
                 <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-pink-500" />
+                  <MapPin className="w-4 h-4 text-violet-500" />
                   {request.offer?.city}
                 </div>
               </div>
@@ -151,10 +151,10 @@ export default function SentOffers() {
                   <img
                     src={request.offer.creator.photo_url}
                     alt={request.offer.creator.name}
-                    className="w-12 h-12 rounded-full object-cover group-hover:ring-2 group-hover:ring-pink-300 transition-all"
+                    className="w-12 h-12 rounded-full object-cover group-hover:ring-2 group-hover:ring-violet-300 transition-all"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-200 to-rose-200 flex items-center justify-center group-hover:ring-2 group-hover:ring-pink-300 transition-all">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-200 to-purple-200 flex items-center justify-center group-hover:ring-2 group-hover:ring-violet-300 transition-all">
                     <span className="text-white font-bold">
                       {request.offer?.creator?.name?.charAt(0).toUpperCase()}
                     </span>
@@ -172,8 +172,8 @@ export default function SentOffers() {
 
             {/* Your Message */}
             {request.message && (
-              <div className="bg-pink-50 rounded-lg p-3 mb-3 border border-pink-100">
-                <p className="text-xs text-pink-600 font-semibold mb-1">Gönderdiğiniz Mesaj:</p>
+              <div className="bg-violet-50 rounded-lg p-3 mb-3 border border-violet-100">
+                <p className="text-xs text-violet-600 font-semibold mb-1">Gönderdiğiniz Mesaj:</p>
                 <p className="text-sm text-gray-700">{request.message}</p>
               </div>
             )}
