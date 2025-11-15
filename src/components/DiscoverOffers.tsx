@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import { MapPin, Calendar, Users, Heart, Filter, Zap, Send, CheckCircle, ArrowRight, Plus } from 'lucide-react';
+import { MapPin, Calendar, Users, Heart, Zap, Send, CheckCircle, ArrowRight, Plus } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import OfferRequestModal from './OfferRequestModal';
@@ -17,16 +17,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<ActivityOffer | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showCreateOffer, setShowCreateOffer] = useState(false);
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
-  const [filters, setFilters] = useState({
-    city: 'my_city' as 'my_city' | 'all' | string,
-    category: 'all' as string,
-    offerType: 'all' as 'all' | 'birebir' | 'grup',
-  });
   const [refreshing, setRefreshing] = useState(false);
   const [pullStart, setPullStart] = useState(0);
   const [pullDistance, setPullDistance] = useState(0);
@@ -77,7 +71,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         // Ignore errors from expire function
       }
 
-      let query = supabase
+      const query = supabase
         .from('activity_offers')
         .select('*, creator:creator_id(*)')
         .eq('status', 'active')
@@ -85,23 +79,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         .gte('event_date', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      // Şehir filtresi
-      if (filters.city === 'my_city') {
-        // Kullanıcının şehrini göster
-        query = query.ilike('city', `%${profile.city}%`);
-      } else if (filters.city !== 'all' && filters.city !== '') {
-        // Özel şehir filtresi
-        query = query.ilike('city', `%${filters.city}%`);
-      }
-      // 'all' seçiliyse hiçbir şehir filtresi uygulanmaz
 
-      if (filters.category !== 'all') {
-        query = query.eq('category', filters.category);
-      }
-
-      if (filters.offerType !== 'all') {
-        query = query.eq('offer_type', filters.offerType);
-      }
 
       const { data, error } = await query.limit(50);
 
@@ -261,90 +239,13 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             <Zap className="w-4 h-4" />
             Boost
           </button>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-              showFilters
-                ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
-                : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-violet-300'
-            }`}
-          >
-            <Filter className="w-4 h-4" />
-            Filtrele
-          </button>
+
         </div>
         
         <p className="text-gray-600 text-sm">Yakınınızdaki etkinlik talepleri</p>
       </div>
 
-      {showFilters && (
-        <div className="mb-6 bg-white rounded-2xl shadow-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Konum</label>
-              <select
-                value={filters.city === 'my_city' || filters.city === 'all' ? filters.city : 'custom'}
-                onChange={(e) => {
-                  if (e.target.value === 'my_city' || e.target.value === 'all') {
-                    setFilters({ ...filters, city: e.target.value });
-                  } else {
-                    setFilters({ ...filters, city: '' });
-                  }
-                }}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
-              >
-                <option value="my_city">Şehrim ({profile?.city})</option>
-                <option value="all">Tüm Türkiye</option>
-                <option value="custom">Özel Şehir</option>
-              </select>
-              {filters.city !== 'my_city' && filters.city !== 'all' && (
-                <input
-                  type="text"
-                  value={filters.city}
-                  onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                  placeholder="Şehir adı girin..."
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none mt-2"
-                />
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-              <select
-                value={filters.category}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
-              >
-                <option value="all">Tümü</option>
-                <option value="kahve">☕ Kahve</option>
-                <option value="yemek">🍽️ Yemek</option>
-                <option value="spor">⚽ Spor</option>
-                <option value="sinema">🎬 Sinema</option>
-                <option value="gezi">🗺️ Gezi</option>
-                <option value="konser">🎵 Konser</option>
-                <option value="diger">✨ Diğer</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Tür</label>
-              <select
-                value={filters.offerType}
-                onChange={(e) => setFilters({ ...filters, offerType: e.target.value as any })}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-violet-400 outline-none"
-              >
-                <option value="all">Tümü</option>
-                <option value="birebir">Birebir</option>
-                <option value="grup">Grup</option>
-              </select>
-            </div>
-          </div>
-          <button
-            onClick={fetchOffers}
-            className="mt-4 w-full py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
-          >
-            Filtreleri Uygula
-          </button>
-        </div>
-      )}
+
 
       {offers.length === 0 ? (
         <div className="text-center py-20">
