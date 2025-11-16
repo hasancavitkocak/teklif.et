@@ -1,108 +1,110 @@
-import { Shield } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
-export default function PrivacyPolicy() {
+type Props = {
+  onBack?: () => void;
+};
+
+export default function PrivacyPolicy({ onBack }: Props) {
   return (
-    <div className="max-w-5xl mx-auto p-6 pb-24">
-      <div className="mb-8 flex items-center gap-4">
-        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
-          <Shield className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Gizlilik Sözleşmesi</h1>
-          <p className="text-gray-600">Son güncelleme: 10 Kasım 2025</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-violet-600 hover:text-violet-700 mb-6"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Geri Dön
+          </button>
+        )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">1. Giriş</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Bu Gizlilik Sözleşmesi, uygulamamızı kullanırken toplanan, işlenen ve saklanan kişisel verilerinizin nasıl korunduğunu açıklar. Gizliliğiniz bizim için son derece önemlidir ve verilerinizi korumak için en yüksek standartları uygularız.
-          </p>
-        </section>
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">Gizlilik Politikası</h1>
+          
+          <div className="prose prose-gray max-w-none">
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">1. Toplanan Bilgiler</h2>
+            <p className="text-gray-600 mb-4">
+              Teklif.et olarak, size daha iyi hizmet verebilmek için aşağıdaki bilgileri topluyoruz:
+            </p>
+            <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
+              <li>Profil bilgileri (ad, yaş, cinsiyet, fotoğraflar)</li>
+              <li>İletişim bilgileri (telefon, e-posta)</li>
+              <li>Konum bilgileri (yakınındaki etkinlikleri göstermek için)</li>
+              <li>Uygulama kullanım verileri</li>
+              <li>Cihaz bilgileri (güvenlik amaçlı)</li>
+            </ul>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">2. Toplanan Bilgiler</h2>
-          <p className="text-gray-600 leading-relaxed mb-3">
-            Uygulamamızı kullanırken aşağıdaki bilgiler toplanabilir:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4">
-            <li>Ad, yaş, cinsiyet gibi profil bilgileri</li>
-            <li>E-posta adresi ve telefon numarası</li>
-            <li>Konum bilgisi (şehir ve yaklaşık mesafe)</li>
-            <li>Profil fotoğrafları ve galeri görselleri</li>
-            <li>Uygulama içi aktivite ve etkileşim verileri</li>
-            <li>Cihaz bilgileri ve IP adresi</li>
-          </ul>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">2. Bilgilerin Kullanımı</h2>
+            <p className="text-gray-600 mb-4">Topladığımız bilgileri şu amaçlarla kullanırız:</p>
+            <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
+              <li>Eşleşme algoritması için profil analizi</li>
+              <li>Yakınındaki etkinlikleri göstermek</li>
+              <li>Güvenlik ve dolandırıcılık önleme</li>
+              <li>Müşteri desteği sağlamak</li>
+              <li>Hizmet kalitesini artırmak</li>
+            </ul>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">3. Bilgilerin Kullanımı</h2>
-          <p className="text-gray-600 leading-relaxed mb-3">
-            Toplanan bilgiler şu amaçlarla kullanılır:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4">
-            <li>Hizmetlerimizi sağlamak ve geliştirmek</li>
-            <li>Size uygun eşleşmeler önermek</li>
-            <li>Hesap güvenliğinizi sağlamak</li>
-            <li>Müşteri desteği sunmak</li>
-            <li>Yasal yükümlülükleri yerine getirmek</li>
-            <li>Dolandırıcılık ve kötüye kullanımı önlemek</li>
-          </ul>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">3. Bilgi Paylaşımı</h2>
+            <p className="text-gray-600 mb-4">
+              Kişisel bilgilerinizi üçüncü taraflarla paylaşmayız. Sadece aşağıdaki durumlarda 
+              bilgi paylaşımı yapabiliriz:
+            </p>
+            <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
+              <li>Yasal zorunluluklar</li>
+              <li>Güvenlik tehditleri</li>
+              <li>Hizmet sağlayıcıları (şifrelenmiş veri)</li>
+            </ul>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">4. Bilgi Paylaşımı</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Kişisel bilgileriniz, açık rızanız olmadan üçüncü şahıslarla paylaşılmaz. Ancak yasal zorunluluklar, mahkeme kararları veya güvenlik nedenleriyle bilgi paylaşımı gerekebilir. Hizmet sağlayıcılarımız (sunucu, ödeme sistemleri) verilerinize sadece hizmet sunmak amacıyla erişebilir.
-          </p>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">4. Veri Güvenliği</h2>
+            <p className="text-gray-600 mb-4">
+              Verilerinizin güvenliği bizim için önceliklidir. Aşağıdaki güvenlik önlemlerini alıyoruz:
+            </p>
+            <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
+              <li>SSL şifreleme ile veri aktarımı</li>
+              <li>Güvenli sunucu altyapısı</li>
+              <li>Düzenli güvenlik denetimleri</li>
+              <li>Erişim kontrolü ve yetkilendirme</li>
+              <li>Veri yedekleme ve kurtarma</li>
+            </ul>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">5. Veri Güvenliği</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Verilerinizi korumak için endüstri standardı güvenlik önlemleri kullanırız. Tüm veriler şifrelenmiş bağlantılar üzerinden iletilir ve güvenli sunucularda saklanır. Ancak internet üzerinden veri iletiminin %100 güvenli olmadığını unutmayın.
-          </p>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">5. Çerezler (Cookies)</h2>
+            <p className="text-gray-600 mb-4">
+              Daha iyi kullanıcı deneyimi için çerezler kullanıyoruz. Çerezleri tarayıcı 
+              ayarlarınızdan yönetebilirsiniz.
+            </p>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">6. Çerezler</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Uygulamamız, kullanıcı deneyimini iyileştirmek için çerezler ve benzeri teknolojiler kullanır. Çerez kullanımı hakkında detaylı bilgi için Çerez Politikamızı inceleyebilirsiniz.
-          </p>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">6. Kullanıcı Hakları</h2>
+            <p className="text-gray-600 mb-4">KVKK kapsamında aşağıdaki haklarınız bulunmaktadır:</p>
+            <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
+              <li>Verilerinize erişim hakkı</li>
+              <li>Veri düzeltme hakkı</li>
+              <li>Veri silme hakkı</li>
+              <li>Veri taşınabilirlik hakkı</li>
+              <li>İşleme itiraz etme hakkı</li>
+            </ul>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">7. Haklarınız</h2>
-          <p className="text-gray-600 leading-relaxed mb-3">
-            KVKK kapsamında aşağıdaki haklara sahipsiniz:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4">
-            <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
-            <li>İşlenmişse buna ilişkin bilgi talep etme</li>
-            <li>Verilerin işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
-            <li>Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme</li>
-            <li>Verilerin eksik veya yanlış işlenmiş olması halinde düzeltilmesini isteme</li>
-            <li>Verilerin silinmesini veya yok edilmesini isteme</li>
-          </ul>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">7. Veri Saklama</h2>
+            <p className="text-gray-600 mb-4">
+              Verilerinizi yasal zorunluluklar ve hizmet kalitesi için gerekli süre boyunca saklarız. 
+              Hesabınızı sildiğinizde verileriniz güvenli şekilde silinir.
+            </p>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">8. Değişiklikler</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Bu Gizlilik Sözleşmesi zaman zaman güncellenebilir. Önemli değişiklikler olduğunda sizi bilgilendireceğiz. Güncel sürümü düzenli olarak kontrol etmenizi öneririz.
-          </p>
-        </section>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">8. Değişiklikler</h2>
+            <p className="text-gray-600 mb-4">
+              Bu gizlilik politikasında değişiklik yapma hakkımız saklıdır. Önemli değişiklikler 
+              hakkında kullanıcılarımızı bilgilendiririz.
+            </p>
 
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">9. İletişim</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz:
-          </p>
-          <div className="mt-3 p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-700">E-posta: privacy@example.com</p>
+            <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-4">9. İletişim</h2>
+            <p className="text-gray-600 mb-4">
+              Gizlilik ile ilgili sorularınız için: <a href="mailto:gizlilik@teklif.et" className="text-violet-600 hover:underline">gizlilik@teklif.et</a>
+            </p>
+
+            <p className="text-sm text-gray-500 mt-8">
+              Son güncelleme: {new Date().toLocaleDateString('tr-TR')}
+            </p>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );

@@ -169,6 +169,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userProfile = await fetchProfile(data.user.id);
       if (userProfile) {
         setProfile(userProfile);
+      } else {
+        // Profil bulunamazsa hata fırlat
+        throw new Error('Profil bulunamadı. Lütfen önce kayıt olun.');
       }
     }
   };
@@ -189,6 +192,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userProfile = await fetchProfile(data.user.id);
       if (userProfile) {
         setProfile(userProfile);
+      } else {
+        // Profil bulunamazsa hata fırlat
+        throw new Error('Profil bulunamadı. Lütfen önce kayıt olun.');
       }
     }
   };

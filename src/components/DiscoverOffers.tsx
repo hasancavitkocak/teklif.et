@@ -2,6 +2,7 @@
 import { MapPin, Calendar, Users, Heart, Zap, Send, CheckCircle, ArrowRight, Plus } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from '../contexts/LocationContext';
 import OfferRequestModal from './OfferRequestModal';
 import ProfileView from './ProfileView';
 import BoostModal from './BoostModal';
@@ -13,6 +14,7 @@ type Props = {
 
 export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const { profile } = useAuth();
+  const { hasLocationPermission, setShowLocationModal } = useLocation();
   const [offers, setOffers] = useState<(ActivityOffer & { creator: Profile })[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<ActivityOffer | null>(null);
@@ -27,9 +29,14 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
   useEffect(() => {
     if (profile) {
-      fetchOffers();
+      // Konum izni yoksa modal göster
+      if (!hasLocationPermission) {
+        setShowLocationModal(true);
+      } else {
+        fetchOffers();
+      }
     }
-  }, [profile?.id]); // Only re-fetch when profile ID changes
+  }, [profile?.id, hasLocationPermission]); // Location permission değiştiğinde de kontrol et
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -175,6 +182,27 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Teklifler yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Konum izni yoksa uyarı göster
+  if (!hasLocationPermission) {
+    return (
+      <div className="max-w-4xl mx-auto pb-24 px-4">
+        <div className="text-center py-20">
+          <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">Konum İzni Gerekli</h3>
+          <p className="text-gray-600 mb-6">
+            Yakınındaki etkinlikleri gösterebilmemiz için konum iznine ihtiyacımız var.
+          </p>
+          <button
+            onClick={() => setShowLocationModal(true)}
+            className="px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            Konum İzni Ver
+          </button>
         </div>
       </div>
     );

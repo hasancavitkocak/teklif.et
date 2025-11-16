@@ -1,6 +1,8 @@
 ﻿import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart } from 'lucide-react';
+import StepByStepRegistration from './StepByStepRegistration';
+import WelcomeScreen from './WelcomeScreen';
 
 
 
@@ -23,6 +25,8 @@ export default function Auth() {
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpType, setOtpType] = useState<'phone' | 'email'>('phone');
+  const [useStepByStep, setUseStepByStep] = useState(false);
+  const [showWelcome] = useState(true);
 
 
   const { signIn, signUp, signInWithPhone } = useAuth();
@@ -287,6 +291,16 @@ export default function Auth() {
     await sendEmailOtp();
   };
 
+  // Welcome screen göster
+  if (showWelcome) {
+    return <WelcomeScreen />;
+  }
+
+  // Step-by-step kayıt kullanılacaksa
+  if (useStepByStep) {
+    return <StepByStepRegistration onClose={() => setUseStepByStep(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -524,6 +538,18 @@ export default function Auth() {
             {error && (
               <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm">
                 {error}
+              </div>
+            )}
+
+            {!isLogin && (
+              <div className="text-center mb-4">
+                <button
+                  type="button"
+                  onClick={() => setUseStepByStep(true)}
+                  className="text-violet-600 hover:text-violet-700 text-sm font-medium underline"
+                >
+                  🚀 Aşamalı kayıt ile devam et (önerilen)
+                </button>
               </div>
             )}
 

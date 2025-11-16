@@ -18,6 +18,14 @@ export type Profile = {
   photo_url?: string;
   bio?: string;
   interests?: string[];
+  education_level?: 'lise' | 'universite' | 'yuksek_lisans' | 'doktora' | 'diger';
+  has_pets?: boolean;
+  pet_type?: string;
+  drinks_alcohol?: 'evet' | 'hayir' | 'bazen';
+  smokes?: 'evet' | 'hayir' | 'bazen';
+  looking_for?: string[];
+  show_profile?: boolean;
+  photos?: string[];
   is_premium: boolean;
   is_admin?: boolean;
   daily_offers_count: number;

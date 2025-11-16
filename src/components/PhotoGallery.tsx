@@ -1,285 +1,186 @@
-﻿import { useState, useEffect, useRef } from 'react';
-import { X, Star, Loader, Plus } from 'lucide-react';
+﻿import { useState, useEffect } from 'react';
+import { X, Loader, Camera, Move } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../contexts/ModalContext';
-
-type Photo = {
-  id: string;
-  photo_url: string;
-  photo_order: number;
-  is_primary: boolean;
-};
 
 const MAX_PHOTOS = 6;
 
 export default function PhotoGallery() {
   const { profile, refreshProfile } = useAuth();
-  const { showModal, showToast } = useModal();
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const { showToast } = useModal();
+  const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    if (profile) {
-      fetchPhotos();
+    if (profile?.photos) {
+      setPhotos(profile.photos);
     }
-  }, [profile?.id]);
+  }, [profile?.photos]);
 
-  const fetchPhotos = async () => {
+  const updatePhotosInDatabase = async (newPhotos: string[]) => {
     if (!profile) return;
 
     try {
-      const { data, error } = await supabase
-        .from('profile_photos')
-        .select('*')
-        .eq('user_id', profile.id)
-        .order('photo_order', { ascending: true });
-
-      if (error) throw error;
-      setPhotos(data || []);
-    } catch (error) {
-      console.error('Error fetching photos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !profile) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast('error', 'Lütfen bir resim dosyası seçin');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('error', 'Dosya boyutu 5MB\'dan küçük olmalıdır');
-      return;
-    }
-
-    if (photos.length >= MAX_PHOTOS) {
-      showToast('warning', `Maksimum ${MAX_PHOTOS} fotoğraf yükleyebilirsiniz`);
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
-      const filePath = `profile-photos/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('photos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('photos')
-        .getPublicUrl(filePath);
-
-      const isPrimary = photos.length === 0;
-      const photoOrder = photos.length;
-
-      const { error: insertError } = await supabase
-        .from('profile_photos')
-        .insert({
-          user_id: profile.id,
-          photo_url: publicUrl,
-          photo_order: photoOrder,
-          is_primary: isPrimary,
-        });
-
-      if (insertError) throw insertError;
-
-      await fetchPhotos();
-      await refreshProfile();
-      
-      showToast('success', 'Fotoğraf başarıyla yüklendi! 📸');
-      
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      showToast('error', 'Fotoğraf yüklenirken bir hata oluştu');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const setPrimaryPhoto = async (photoId: string) => {
-    try {
       const { error } = await supabase
-        .from('profile_photos')
-        .update({ is_primary: true })
-        .eq('id', photoId);
+        .from('profiles')
+        .update({ 
+          photos: newPhotos,
+          photo_url: newPhotos[0] || null // İlk fotoğraf profil fotoğrafı
+        })
+        .eq('id', profile.id);
 
       if (error) throw error;
-
-      await fetchPhotos();
       await refreshProfile();
-      showToast('success', 'Ana fotoğraf güncellendi! ⭐');
+      showToast('success', 'Fotoğraflar güncellendi');
     } catch (error) {
-      console.error('Error setting primary:', error);
-      showToast('error', 'Ana fotoğraf ayarlanırken bir hata oluştu');
+      console.error('Error updating photos:', error);
+      showToast('error', 'Fotoğraf güncellenirken hata oluştu');
     }
   };
 
-  const deletePhoto = async (photoId: string, photoUrl: string) => {
-    showModal(
-      'confirm',
-      'Fotoğrafı Sil',
-      'Bu fotoğrafı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
-      async () => {
+  const handlePhotoUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        setUploading(true);
         try {
-          // Delete from storage
-          const filePath = photoUrl.split('/').slice(-2).join('/');
-          await supabase.storage.from('photos').remove([filePath]);
-
-          // Delete from database
-          const { error } = await supabase
-            .from('profile_photos')
-            .delete()
-            .eq('id', photoId);
-
-          if (error) throw error;
-
-          await fetchPhotos();
-          await refreshProfile();
-          showToast('success', 'Fotoğraf silindi');
+          // Gerçek uygulamada burada dosya yükleme işlemi yapılacak
+          // Şimdilik base64 olarak saklıyoruz
+          const reader = new FileReader();
+          reader.onload = async () => {
+            // Sıralı olarak ekle - boş olan ilk slota ekle
+            const newPhotos = [...photos];
+            const emptyIndex = newPhotos.findIndex(photo => !photo);
+            if (emptyIndex !== -1) {
+              newPhotos[emptyIndex] = reader.result as string;
+            } else {
+              // Boş slot yoksa sona ekle
+              newPhotos.push(reader.result as string);
+            }
+            setPhotos(newPhotos);
+            await updatePhotosInDatabase(newPhotos);
+          };
+          reader.readAsDataURL(file);
         } catch (error) {
-          console.error('Delete error:', error);
-          showToast('error', 'Fotoğraf silinirken bir hata oluştu');
+          console.error('Error uploading photo:', error);
+          showToast('error', 'Fotoğraf yüklenirken hata oluştu');
+        } finally {
+          setUploading(false);
         }
       }
-    );
+    };
+    input.click();
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-10">
-        <Loader className="w-8 h-8 text-violet-500 animate-spin" />
-      </div>
-    );
-  }
+  // Sürükle-bırak fonksiyonları
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    // Fotoğrafları yeniden sırala
+    const newPhotos = [...photos];
+    const draggedPhoto = newPhotos[draggedIndex];
+    
+    // Sürüklenen fotoğrafı kaldır
+    newPhotos.splice(draggedIndex, 1);
+    
+    // Yeni pozisyona ekle
+    newPhotos.splice(dropIndex, 0, draggedPhoto);
+    
+    setPhotos(newPhotos);
+    await updatePhotosInDatabase(newPhotos);
+    setDraggedIndex(null);
+  };
+
+  const removePhoto = async (index: number) => {
+    const newPhotos = [...photos];
+    newPhotos.splice(index, 1); // Fotoğrafı sil
+    setPhotos(newPhotos);
+    await updatePhotosInDatabase(newPhotos);
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-bold text-gray-800">Fotoğraf Galerisi</h3>
-          <p className="text-sm text-gray-600">
-            {photos.length}/{MAX_PHOTOS} fotoğraf • İlk fotoğraf profil fotoğrafınız olur
-          </p>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-800">Fotoğraflar</h3>
+        <span className="text-sm text-gray-500">{photos.length}/{MAX_PHOTOS}</span>
       </div>
 
-      {/* Photo Grid */}
-      <div className="grid grid-cols-3 gap-4">
-        {photos.map((photo, index) => (
+      <div className="grid grid-cols-3 gap-3">
+        {Array.from({ length: MAX_PHOTOS }).map((_, index) => (
           <div
-            key={photo.id}
-            className="relative aspect-square rounded-2xl overflow-hidden group"
+            key={index}
+            className={`aspect-square rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all relative ${
+              photos[index]
+                ? 'border-violet-400 bg-violet-50'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onClick={() => {
+              if (!photos[index] && !uploading) {
+                handlePhotoUpload(index);
+              }
+            }}
           >
-            <img
-              src={photo.photo_url}
-              alt={`Fotoğraf ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              {!photo.is_primary && (
+            {photos[index] ? (
+              <div className="relative w-full h-full">
+                <img 
+                  src={photos[index]} 
+                  alt={`Fotoğraf ${index + 1}`}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+                {index === 0 && (
+                  <div className="absolute top-2 left-2 bg-violet-500 text-white text-xs px-2 py-1 rounded-full">
+                    Profil
+                  </div>
+                )}
                 <button
-                  onClick={() => setPrimaryPhoto(photo.id)}
-                  className="p-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-colors"
-                  title="Ana Fotoğraf Yap"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhoto(index);
+                  }}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
                 >
-                  <Star className="w-4 h-4" />
+                  <X className="w-3 h-3" />
                 </button>
-              )}
-              <button
-                onClick={() => deletePhoto(photo.id, photo.photo_url)}
-                className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                title="Sil"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Primary Badge */}
-            {photo.is_primary && (
-              <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                <Star className="w-3 h-3 fill-white" />
-                Ana
+              </div>
+            ) : (
+              <div className="text-center">
+                {uploading ? (
+                  <Loader className="w-6 h-6 text-violet-500 animate-spin mx-auto mb-1" />
+                ) : (
+                  <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                )}
+                <span className="text-xs text-gray-500">
+                  {uploading ? 'Yükleniyor...' : 'Ekle'}
+                </span>
               </div>
             )}
-
-            {/* Order Badge */}
-            <div className="absolute top-2 right-2 bg-black/70 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
-              {index + 1}
-            </div>
           </div>
         ))}
-
-        {/* Add Photo Button */}
-        {photos.length < MAX_PHOTOS && (
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 hover:border-violet-400 hover:bg-violet-50 transition-all flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {uploading ? (
-              <>
-                <Loader className="w-8 h-8 text-violet-500 animate-spin" />
-                <span className="text-sm text-violet-600 font-medium">Yükleniyor...</span>
-              </>
-            ) : (
-              <>
-                <Plus className="w-8 h-8 text-gray-400" />
-                <span className="text-sm text-gray-600 font-medium">Ekle</span>
-              </>
-            )}
-          </button>
-        )}
       </div>
 
-      {/* Full Screen Loader Overlay */}
-      {uploading && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4">
-            <Loader className="w-16 h-16 text-violet-500 animate-spin" />
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-800">Fotoğraf Yükleniyor</p>
-              <p className="text-sm text-gray-600">Lütfen bekleyin...</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-
-      {/* Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-700">
-          💡 <strong>İpucu:</strong> İlk fotoğrafınız profil fotoğrafınız olur. 
-          Yıldız ikonuna tıklayarak ana fotoğrafı değiştirebilirsiniz.
-        </p>
-      </div>
+      <p className="text-xs text-gray-500 text-center">
+        İlk fotoğraf profil fotoğrafınız olarak kullanılacak
+      </p>
     </div>
   );
 }

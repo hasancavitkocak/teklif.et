@@ -25,7 +25,6 @@ export default function Profile({ onNavigate }: ProfileProps) {
 
   const [formData, setFormData] = useState({
     name: '',
-    age: 0,
     city: '',
     bio: '',
   });
@@ -34,8 +33,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
     if (profile) {
       setFormData({
         name: profile.name,
-        age: profile.age,
-        city: profile.city,
+        city: profile.city || '',
         bio: profile.bio || '',
       });
     }
@@ -52,7 +50,6 @@ export default function Profile({ onNavigate }: ProfileProps) {
         .from('profiles')
         .update({
           name: formData.name,
-          age: formData.age,
           city: formData.city,
           bio: formData.bio || null,
         })
@@ -76,8 +73,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
     if (profile) {
       setFormData({
         name: profile.name,
-        age: profile.age,
-        city: profile.city,
+        city: profile.city || '',
         bio: profile.bio || '',
       });
     }
@@ -124,7 +120,13 @@ export default function Profile({ onNavigate }: ProfileProps) {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         {/* Compact header with profile photo */}
         <div className="bg-gradient-to-r from-violet-500 to-purple-500 p-6 flex items-center gap-4">
-          {profile.photo_url ? (
+          {(profile.photos && profile.photos.length > 0) ? (
+            <img
+              src={profile.photos[0]}
+              alt={profile.name}
+              className="w-20 h-20 rounded-full object-cover border-3 border-white shadow-lg"
+            />
+          ) : profile.photo_url ? (
             <img
               src={profile.photo_url}
               alt={profile.name}
@@ -151,8 +153,8 @@ export default function Profile({ onNavigate }: ProfileProps) {
             </div>
           )}
           
-          {/* Photo Gallery View (Always Visible) */}
-          {!isEditing && (
+          {/* Photo Gallery View (Only if photos exist) */}
+          {!isEditing && profile.photos && profile.photos.length > 0 && (
             <div className="mb-8">
               <PhotoGalleryView userId={profile.id} userName={profile.name} />
             </div>
@@ -172,19 +174,7 @@ export default function Profile({ onNavigate }: ProfileProps) {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Yaş
-                </label>
-                <input
-                  type="number"
-                  value={formData.age}
-                  onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 0 })}
-                  min="18"
-                  max="100"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
-                />
-              </div>
+
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

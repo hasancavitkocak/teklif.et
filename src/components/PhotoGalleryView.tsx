@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 type PhotoGalleryViewProps = {
   userId: string;
@@ -8,28 +9,49 @@ type PhotoGalleryViewProps = {
 };
 
 export default function PhotoGalleryView({ userId, userName }: PhotoGalleryViewProps) {
+  const { profile } = useAuth();
   const [photos, setPhotos] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPhotos();
-  }, [userId]);
+    // Kendi profilimizse photos array'ini kullan
+    if (profile && profile.id === userId && profile.photos) {
+      setPhotos(profile.photos);
+      setLoading(false);
+    } else {
+      fetchPhotos();
+    }
+  }, [userId, profile]);
 
   const fetchPhotos = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profile_photos')
-        .select('photo_url')
-        .eq('user_id', userId)
-        .order('photo_order', { ascending: true });
+      // Önce profiles tablosundan photos array'ini kontrol et
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('photos')
+        .eq('id', userId)
+        .single();
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
-      const photoUrls = data?.map(p => p.photo_url) || [];
-      setPhotos(photoUrls);
+      if (profileData?.photos && profileData.photos.length > 0) {
+        setPhotos(profileData.photos);
+      } else {
+        // Fallback: eski profile_photos tablosundan kontrol et
+        const { data, error } = await supabase
+          .from('profile_photos')
+          .select('photo_url')
+          .eq('user_id', userId)
+          .order('photo_order', { ascending: true });
+
+        if (error) throw error;
+        const photoUrls = data?.map(p => p.photo_url) || [];
+        setPhotos(photoUrls);
+      }
     } catch (error) {
       console.error('Error fetching photos:', error);
+      setPhotos([]);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,8 @@
 ﻿import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ModalProvider } from './contexts/ModalContext';
+import { LocationProvider } from './contexts/LocationContext';
+import LocationPermissionModal from './components/LocationPermissionModal';
 import { useNotifications } from './hooks/useNotifications';
 import { useCapacitor } from './hooks/useCapacitor';
 import { usePushNotifications } from './hooks/usePushNotifications';
@@ -93,6 +95,7 @@ function AppContent() {
       {currentPage === 'terms' && <TermsOfService />}
       {currentPage === 'kvkk' && <KVKK />}
       {currentPage === 'cookies' && <CookiePolicy />}
+      <LocationPermissionModal />
     </Layout>
   );
 }
@@ -101,7 +104,9 @@ function App() {
   return (
     <AuthProvider>
       <ModalProvider>
-        <AppContent />
+        <LocationProvider>
+          <AppContent />
+        </LocationProvider>
       </ModalProvider>
     </AuthProvider>
   );
