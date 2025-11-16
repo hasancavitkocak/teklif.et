@@ -120,7 +120,7 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
         </header>
       )}
 
-      <main className="content-with-fixed-bars w-full mx-auto px-4 py-6">
+      <main className="content-with-fixed-bars w-full mx-auto">
         {children}
       </main>
 

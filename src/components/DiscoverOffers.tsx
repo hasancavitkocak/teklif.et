@@ -32,6 +32,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [lastMoveTime, setLastMoveTime] = useState(0);
 
   useEffect(() => {
     if (profile) {
@@ -63,69 +64,53 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     }
   };
 
-  // Swipe handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!currentOffer) return;
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
+  // Swipe handlers - Optimized for performance
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!currentOffer) return;
+    e.preventDefault();
     setIsDragging(true);
     setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !currentOffer) return;
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
-    setDragOffset({ x: deltaX, y: deltaY });
-    
-    // Determine swipe direction
-    if (Math.abs(deltaX) > 50) {
-      setSwipeDirection(deltaX > 0 ? 'right' : 'left');
-    } else {
-      setSwipeDirection(null);
-    }
+    setDragOffset({ x: 0, y: 0 });
+    setSwipeDirection(null);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !currentOffer) return;
+    e.preventDefault();
+    
+    // Throttle move events for better performance
+    const now = Date.now();
+    if (now - lastMoveTime < 16) return; // ~60fps
+    setLastMoveTime(now);
+    
     const deltaX = e.touches[0].clientX - dragStart.x;
     const deltaY = e.touches[0].clientY - dragStart.y;
-    setDragOffset({ x: deltaX, y: deltaY });
     
-    // Determine swipe direction
-    if (Math.abs(deltaX) > 50) {
-      setSwipeDirection(deltaX > 0 ? 'right' : 'left');
-    } else {
+    // Sadece yatay hareketi izin ver, dikey hareketi sınırla
+    const constrainedDeltaX = Math.max(-200, Math.min(200, deltaX));
+    const constrainedDeltaY = Math.max(-30, Math.min(30, deltaY));
+    
+    setDragOffset({ x: constrainedDeltaX, y: constrainedDeltaY });
+    
+    // Swipe direction - daha hassas threshold
+    if (Math.abs(constrainedDeltaX) > 40) {
+      const newDirection = constrainedDeltaX > 0 ? 'right' : 'left';
+      if (swipeDirection !== newDirection) {
+        setSwipeDirection(newDirection);
+      }
+    } else if (swipeDirection !== null) {
       setSwipeDirection(null);
     }
   };
 
-  const handleMouseUp = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isDragging || !currentOffer) return;
+    e.preventDefault();
     
-    const threshold = 100;
-    if (Math.abs(dragOffset.x) > threshold) {
-      if (dragOffset.x > 0) {
-        // Swipe right - Like
-        handleLike();
-      } else {
-        // Swipe left - Skip
-        handleSkip();
-      }
-    }
+    const threshold = 80; // Daha düşük threshold
+    const velocity = Math.abs(dragOffset.x);
     
-    resetDrag();
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging || !currentOffer) return;
-    
-    const threshold = 100;
-    if (Math.abs(dragOffset.x) > threshold) {
+    if (velocity > threshold) {
       if (dragOffset.x > 0) {
         // Swipe right - Like
         handleLike();
@@ -285,7 +270,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-white to-purple-50 overflow-hidden">
+    <div className="bg-gradient-to-br from-violet-50 via-white to-purple-50 min-h-screen overflow-hidden">
       {refreshing && (
         <div className="fixed top-20 left-0 right-0 flex justify-center z-50">
           <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
@@ -296,9 +281,9 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       )}
 
       {/* Top Action Bar */}
-      <div className="absolute top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
-        <div className="px-4 pb-4">
-          <div className="flex items-center justify-between mb-3">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-4">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-800">Keşfet</h2>
             <div className="flex items-center gap-2">
               <button
@@ -319,7 +304,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       </div>
 
       {/* Main Card Area */}
-      <div className="absolute inset-0 flex items-start justify-center px-4 py-2" style={{ paddingTop: 'calc(90px + max(16px, env(safe-area-inset-top)))', paddingBottom: 'calc(80px + max(20px, env(safe-area-inset-bottom)))' }}>
+      <div className="flex items-start justify-center px-4" style={{ minHeight: 'calc(100vh - 200px)' }}>
         {!currentOffer ? (
           <div className="text-center">
             <Heart className="w-20 h-20 text-violet-300 mx-auto mb-6" />
@@ -342,33 +327,35 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             {/* Swipeable Card */}
             <div
               ref={cardRef}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing mb-4"
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden touch-pan-y mb-4"
               style={{
                 height: 'calc(100vh - 280px)',
-                transform: `translate(${dragOffset.x}px, ${dragOffset.y}px) rotate(${dragOffset.x * 0.1}deg)`,
-                transition: isDragging ? 'none' : 'transform 0.3s ease-out',
-                opacity: Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300)
+                transform: isDragging 
+                  ? `translate3d(${dragOffset.x}px, ${dragOffset.y * 0.5}px, 0) rotate(${dragOffset.x * 0.05}deg)` 
+                  : 'translate3d(0, 0, 0) rotate(0deg)',
+                transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                opacity: isDragging ? Math.max(0.8, 1 - Math.abs(dragOffset.x) / 250) : 1,
+                willChange: isDragging ? 'transform, opacity' : 'auto'
               }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              {/* Swipe Indicators */}
-              {swipeDirection === 'left' && (
-                <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center z-10">
-                  <div className="bg-red-500 text-white px-6 py-3 rounded-full font-bold text-xl transform rotate-12">
-                    GEÇ
-                  </div>
-                </div>
-              )}
-              {swipeDirection === 'right' && (
-                <div className="absolute inset-0 bg-violet-500/20 flex items-center justify-center z-10">
-                  <div className="bg-gradient-to-r from-violet-500 to-purple-500 text-white px-6 py-3 rounded-full font-bold text-lg transform -rotate-12">
-                    TEKLİF GÖNDER
+              {/* Swipe Indicators - Optimized */}
+              {swipeDirection && (
+                <div 
+                  className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-150 ${
+                    swipeDirection === 'left' ? 'bg-red-500/15' : 'bg-violet-500/15'
+                  }`}
+                >
+                  <div 
+                    className={`px-4 py-2 rounded-full font-bold text-lg transform transition-transform duration-150 ${
+                      swipeDirection === 'left' 
+                        ? 'bg-red-500 text-white rotate-12' 
+                        : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white -rotate-12'
+                    }`}
+                  >
+                    {swipeDirection === 'left' ? 'GEÇ' : 'TEKLİF GÖNDER'}
                   </div>
                 </div>
               )}
