@@ -40,7 +40,7 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
   const [petType, setPetType] = useState('');
   const [drinksAlcohol, setDrinksAlcohol] = useState<'evet' | 'hayir' | 'bazen' | ''>('');
   const [smokes, setSmokes] = useState<'evet' | 'hayir' | 'bazen' | ''>('');
-  const [photos, setPhotos] = useState<string[]>(Array(6).fill(''));
+  const [photos, setPhotos] = useState<string[]>([]);
   const [rulesAccepted, setRulesAccepted] = useState(false);
 
   const { signUp } = useAuth();
@@ -165,7 +165,7 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
         pet_type: hasPets ? petType : undefined,
         drinks_alcohol: drinksAlcohol || 'hayir',
         smokes: smokes || 'hayir',
-        photos: photos,
+        photos: photos.filter(photo => photo && photo.trim() !== ''),
       };
 
       await signUp(email || `${phone.replace(/\D/g, '')}@phone.local`, '123456', userData);
@@ -668,13 +668,9 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
               const compressedSizeKB = getBase64Size(compressedImage);
               console.log(`Orijinal boyut: ${Math.round(file.size / 1024)}KB, Sıkıştırılmış boyut: ${compressedSizeKB}KB`);
               
-              // Sıralı olarak ekle - boş olan ilk slota ekle
-              const newPhotos = [...photos];
-              const emptyIndex = newPhotos.findIndex(photo => !photo);
-              if (emptyIndex !== -1) {
-                newPhotos[emptyIndex] = compressedImage;
-                setPhotos(newPhotos);
-              }
+              // Yeni fotoğrafı sona ekle
+              const newPhotos = [...photos, compressedImage];
+              setPhotos(newPhotos);
               
             } catch (error) {
               console.error('Fotoğraf işleme hatası:', error);
@@ -687,8 +683,7 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
         };
 
         const removePhoto = (index: number) => {
-          const newPhotos = [...photos];
-          newPhotos[index] = '';
+          const newPhotos = photos.filter((_, i) => i !== index);
           setPhotos(newPhotos);
         };
 
@@ -699,57 +694,55 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
             <p className="text-gray-600 mb-6">En az 2, en fazla 6 fotoğraf ekle</p>
             
             <div className="grid grid-cols-3 gap-3 mb-6">
-              {Array.from({ length: 6 }).map((_, index) => (
+              {/* Mevcut fotoğraflar */}
+              {photos.map((photo, index) => (
                 <div
-                  key={index}
-                  className={`aspect-square rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all relative ${
-                    photos[index]
-                      ? 'border-violet-400 bg-violet-50'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  onClick={() => {
-                    if (!photos[index]) {
-                      handlePhotoUpload();
-                    }
-                  }}
+                  key={`photo-${index}`}
+                  className="aspect-square rounded-xl border-2 border-violet-400 bg-violet-50 flex items-center justify-center cursor-pointer transition-all relative hover:scale-105"
                 >
-                  {photos[index] ? (
-                    <div className="relative w-full h-full">
-                      <img 
-                        src={photos[index]} 
-                        alt={`Fotoğraf ${index + 1}`}
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removePhoto(index);
-                        }}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                      <span className="text-xs text-gray-500">Ekle</span>
-                    </div>
-                  )}
+                  <div className="relative w-full h-full">
+                    <img 
+                      src={photo} 
+                      alt={`Fotoğraf ${index + 1}`}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removePhoto(index);
+                      }}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
               ))}
+
+              {/* Fotoğraf ekleme butonu */}
+              {photos.length < 6 && (
+                <div
+                  className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center cursor-pointer transition-all"
+                  onClick={handlePhotoUpload}
+                >
+                  <div className="text-center">
+                    <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                    <span className="text-xs text-gray-500">Ekle</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <p className="text-sm text-gray-500 mb-6">
-              {photos.filter(Boolean).length}/6 fotoğraf eklendi
-              {photos.filter(Boolean).length < 2 && (
+              {photos.length}/6 fotoğraf eklendi
+              {photos.length < 2 && (
                 <span className="text-red-500"> (En az 2 fotoğraf gerekli)</span>
               )}
             </p>
 
             <button
               onClick={handleFinalSubmit}
-              disabled={loading || photos.filter(Boolean).length < 2}
+              disabled={loading || photos.length < 2}
               className="w-full py-3 px-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
               {loading ? 'Kayıt Oluşturuluyor...' : 'Kayıt Ol'}

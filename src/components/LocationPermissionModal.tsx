@@ -18,10 +18,18 @@ export default function LocationPermissionModal() {
       if (granted) {
         setShowLocationModal(false);
       } else {
-        setError('Konum izni reddedildi. Tarayıcı ayarlarından konum iznini manuel olarak verebilirsiniz.');
+        // Mobil cihaz için daha detaylı rehberlik
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          setError('Konum izni reddedildi. Lütfen:\n1. Tarayıcı ayarlarından konum iznini açın\n2. Uygulama ayarlarından konum iznini verin\n3. Sayfayı yenileyin');
+        } else {
+          setError('Konum izni reddedildi. Tarayıcı ayarlarından konum iznini manuel olarak verebilirsiniz.');
+        }
       }
     } catch (err) {
-      setError('Konum izni alınırken hata oluştu. Lütfen tekrar deneyin.');
+      console.error('Location permission error:', err);
+      setError('Konum izni alınırken hata oluştu. Cihaz ayarlarınızı kontrol edin.');
     } finally {
       setIsRequesting(false);
     }
@@ -94,9 +102,12 @@ export default function LocationPermissionModal() {
             </button>
           </div>
 
-          <p className="text-xs text-gray-500 mt-4">
-            Mobil cihazlarda tarayıcı ayarlarından konum iznini manuel olarak vermeniz gerekebilir.
-          </p>
+          <div className="text-xs text-gray-500 mt-4 space-y-1">
+            <p>📱 Mobil cihazlarda:</p>
+            <p>• Tarayıcı ayarlarından konum iznini açın</p>
+            <p>• Uygulama ayarlarından konum erişimini verin</p>
+            <p>• Sayfayı yenileyip tekrar deneyin</p>
+          </div>
         </div>
       </div>
     </div>

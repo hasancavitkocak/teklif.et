@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { checkLocationPermission, requestLocationPermission as requestPermission, getCurrentLocation, getPlatformInfo } from '../utils/locationUtils';
 
 type LocationContextType = {
   hasLocationPermission: boolean;
@@ -14,16 +15,32 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
 
-  // Sayfa yüklendiğinde localStorage'dan kontrol et
+  // Sayfa yüklendiğinde permission durumunu kontrol et
   useEffect(() => {
-    try {
-      const savedPermission = localStorage.getItem('locationPermission');
-      if (savedPermission === 'true') {
-        setHasLocationPermission(true);
+    const checkInitialPermission = async () => {
+      try {
+        // Önce localStorage'dan kontrol et
+        const savedPermission = localStorage.getItem('locationPermission');
+        if (savedPermission === 'true') {
+          setHasLocationPermission(true);
+          return;
+        }
+
+        // Gerçek permission durumunu kontrol et
+        try {
+          const permissionStatus = await checkLocationPermission();
+          if (permissionStatus.granted) {
+            setLocationPermission(true);
+          }
+        } catch (error) {
+          console.log('Error checking initial permissions:', error);
+        }
+      } catch (error) {
+        console.log('Error in initial permission check:', error);
       }
-    } catch (error) {
-      console.log('localStorage not available');
-    }
+    };
+
+    checkInitialPermission();
   }, []);
 
   const setLocationPermission = (permission: boolean) => {
@@ -36,47 +53,36 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   };
 
   const requestLocationPermission = async (): Promise<boolean> => {
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) {
-        console.log('Geolocation not supported');
-        setLocationPermission(false);
-        resolve(false);
-        return;
-      }
-
-      // Mobil cihazlar için daha detaylı options
-      const options = {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 300000 // 5 dakika cache
-      };
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Location permission granted:', position.coords);
+    try {
+      const platformInfo = getPlatformInfo();
+      console.log('Platform info:', platformInfo);
+      
+      // Permission iste
+      const granted = await requestPermission();
+      console.log('Permission request result:', granted);
+      
+      if (granted) {
+        // Test için konum al
+        const location = await getCurrentLocation();
+        if (location) {
+          console.log('Location obtained:', location);
           setLocationPermission(true);
-          resolve(true);
-        },
-        (error) => {
-          console.log('Location permission denied:', error.message);
-          // Hata koduna göre farklı mesajlar
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              console.log('User denied the request for Geolocation.');
-              break;
-            case error.POSITION_UNAVAILABLE:
-              console.log('Location information is unavailable.');
-              break;
-            case error.TIMEOUT:
-              console.log('The request to get user location timed out.');
-              break;
-          }
+          return true;
+        } else {
+          console.log('Could not get location despite permission');
           setLocationPermission(false);
-          resolve(false);
-        },
-        options
-      );
-    });
+          return false;
+        }
+      } else {
+        console.log('Location permission denied');
+        setLocationPermission(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+      setLocationPermission(false);
+      return false;
+    }
   };
 
 

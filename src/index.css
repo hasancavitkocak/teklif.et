@@ -94,6 +94,59 @@
   .animate-scale-in {
     animation: scale-in 0.3s ease-out;
   }
+
+  /* Tinder-style swipe animations */
+  @keyframes swipe-left {
+    0% {
+      transform: translateX(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(-100vw) rotate(-30deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes swipe-right {
+    0% {
+      transform: translateX(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100vw) rotate(30deg);
+      opacity: 0;
+    }
+  }
+
+  .swipe-left {
+    animation: swipe-left 0.3s ease-out forwards;
+  }
+
+  .swipe-right {
+    animation: swipe-right 0.3s ease-out forwards;
+  }
+
+  /* Card stack effect */
+  .card-stack {
+    transform-style: preserve-3d;
+  }
+
+  .card-stack .card:nth-child(1) {
+    z-index: 3;
+    transform: scale(1) translateY(0);
+  }
+
+  .card-stack .card:nth-child(2) {
+    z-index: 2;
+    transform: scale(0.95) translateY(10px);
+    opacity: 0.8;
+  }
+
+  .card-stack .card:nth-child(3) {
+    z-index: 1;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0.6;
+  }
 }
 
 /* Range slider styles */
@@ -161,5 +214,43 @@ input[type="range"].slider:focus::-moz-range-thumb {
 /* Prevent default pull-to-refresh on mobile browsers */
 body {
   overscroll-behavior-y: contain;
+}
+
+/* Fixed navigation bars for mobile */
+.fixed-header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transform: translateZ(0); /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+}
+
+.fixed-footer {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  transform: translateZ(0); /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+}
+
+/* Prevent scrolling issues on iOS */
+@supports (-webkit-touch-callout: none) {
+  .fixed-header,
+  .fixed-footer {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Ensure content doesn't go under fixed bars */
+.content-with-fixed-bars {
+  padding-top: calc(70px + env(safe-area-inset-top));
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 

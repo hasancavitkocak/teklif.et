@@ -74,8 +74,13 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50">
       {isLegalPage ? (
         // Legal pages header with back button
-        <header className="fixed top-0 left-0 right-0 md:sticky bg-white border-b border-gray-100 z-50 shadow-sm safe-top">
-          <div className="w-full px-4 py-4">
+        <header 
+          className="fixed-header bg-white border-b border-gray-100 shadow-sm"
+          style={{
+            paddingTop: 'max(16px, env(safe-area-inset-top))'
+          }}
+        >
+          <div className="w-full px-4 pb-4">
             <button
               onClick={() => onNavigate('profile')}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
@@ -87,8 +92,14 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
         </header>
       ) : (
         // Normal header - White background with colored text - FIXED for mobile
-        <header className="fixed top-0 left-0 right-0 md:sticky bg-white border-b border-gray-100 z-50 shadow-sm safe-top">
-          <div className="w-full mx-auto px-4 py-4 flex items-center justify-between">
+        <header 
+          className="fixed-header bg-white border-b border-gray-100 shadow-sm"
+          style={{
+            paddingTop: 'max(16px, env(safe-area-inset-top))',
+            paddingBottom: '16px'
+          }}
+        >
+          <div className="w-full mx-auto px-4 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Heart className="w-7 h-7 text-violet-500 fill-violet-500" />
               <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-violet-500 to-purple-500 bg-clip-text text-transparent">
@@ -109,21 +120,21 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
         </header>
       )}
 
-      <main className="w-full mx-auto px-4 py-6 pt-20 md:pt-6">
+      <main className="content-with-fixed-bars w-full mx-auto px-4 py-6">
         {children}
       </main>
 
       {!isLegalPage && (
         <nav 
-          className="fixed bottom-0 left-0 right-0 bg-white shadow-lg pb-safe" 
+          className="fixed-footer bg-white shadow-lg" 
           style={{ 
             borderTop: '1px solid #eaeaea',
-            zIndex: 40,
-            paddingBottom: 'max(12px, env(safe-area-inset-bottom))'
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+            paddingTop: '12px'
           }}
         >
           <div className="w-full px-2 md:px-4">
-            <div className="flex items-center justify-around py-3">
+            <div className="flex items-center justify-around pb-3">
               <button
                 onClick={() => onNavigate('discover')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${

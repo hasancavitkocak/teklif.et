@@ -84,7 +84,7 @@ export default function WelcomeScreen() {
               onClick={() => setShowRegisterPage(true)}
               className="w-full py-4 px-6 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
             >
-              🚀 Üye Ol
+              Üye Ol
             </button>
             
             <button

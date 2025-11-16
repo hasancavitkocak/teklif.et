@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { MapPin, Calendar, Users, Heart, Zap, Send, CheckCircle, ArrowRight, Plus, X } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { MapPin, Calendar, Users, Heart, Zap, CheckCircle, ArrowRight, Plus, X, RotateCcw } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
@@ -25,6 +25,13 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [skippedOfferIds, setSkippedOfferIds] = useState<string[]>([]);
+  
+  // Swipe functionality
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -48,6 +55,93 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       setSkippedOfferIds(prev => [...prev, currentOffer.id]);
       fetchNextOffer();
     }
+  };
+
+  const handleLike = () => {
+    if (currentOffer) {
+      setSelectedOffer(currentOffer);
+    }
+  };
+
+  // Swipe handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!currentOffer) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!currentOffer) return;
+    setIsDragging(true);
+    setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !currentOffer) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    setDragOffset({ x: deltaX, y: deltaY });
+    
+    // Determine swipe direction
+    if (Math.abs(deltaX) > 50) {
+      setSwipeDirection(deltaX > 0 ? 'right' : 'left');
+    } else {
+      setSwipeDirection(null);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !currentOffer) return;
+    const deltaX = e.touches[0].clientX - dragStart.x;
+    const deltaY = e.touches[0].clientY - dragStart.y;
+    setDragOffset({ x: deltaX, y: deltaY });
+    
+    // Determine swipe direction
+    if (Math.abs(deltaX) > 50) {
+      setSwipeDirection(deltaX > 0 ? 'right' : 'left');
+    } else {
+      setSwipeDirection(null);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging || !currentOffer) return;
+    
+    const threshold = 100;
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        // Swipe right - Like
+        handleLike();
+      } else {
+        // Swipe left - Skip
+        handleSkip();
+      }
+    }
+    
+    resetDrag();
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || !currentOffer) return;
+    
+    const threshold = 100;
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        // Swipe right - Like
+        handleLike();
+      } else {
+        // Swipe left - Skip
+        handleSkip();
+      }
+    }
+    
+    resetDrag();
+  };
+
+  const resetDrag = () => {
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
+    setSwipeDirection(null);
   };
 
   const fetchNextOffer = async () => {
@@ -191,9 +285,9 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   }
 
   return (
-    <div className="max-w-md mx-auto pb-24 px-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-white to-purple-50 overflow-hidden">
       {refreshing && (
-        <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
+        <div className="fixed top-20 left-0 right-0 flex justify-center z-50">
           <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-medium text-gray-700">Yenileniyor...</span>
@@ -201,147 +295,183 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         </div>
       )}
 
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-2xl font-bold text-gray-800">Keşfet</h2>
+      {/* Top Action Bar */}
+      <div className="absolute top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
+        <div className="px-4 pb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-gray-800">Keşfet</h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowCreateOffer(true)}
+                className="p-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setShowBoostModal(true)}
+                className="p-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 mb-3">
-          <button
-            onClick={() => setShowCreateOffer(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            Talep Oluştur
-          </button>
-          <button
-            onClick={() => setShowBoostModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all"
-          >
-            <Zap className="w-4 h-4" />
-            Boost
-          </button>
-        </div>
-        
-        <p className="text-gray-600 text-sm">Yakınınızdaki etkinlik talepleri</p>
       </div>
 
-      {!currentOffer ? (
-        <div className="text-center py-20">
-          <Heart className="w-16 h-16 text-violet-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Henüz talep yok
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Yakınınızda yeni talepler olduğunda bildireceğiz
-          </p>
-          <button
-            onClick={handleRefresh}
-            className="px-6 py-2 bg-violet-500 text-white rounded-lg font-medium hover:bg-violet-600 transition-all"
-          >
-            Yenile
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Single Offer Card */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            {/* Profile Header */}
-            <div 
-              className="relative h-64 bg-gradient-to-br from-violet-200 to-purple-200 cursor-pointer"
-              onClick={() => setSelectedProfile(currentOffer.creator)}
+      {/* Main Card Area */}
+      <div className="absolute inset-0 flex items-start justify-center px-4 py-2" style={{ paddingTop: 'calc(90px + max(16px, env(safe-area-inset-top)))', paddingBottom: 'calc(80px + max(20px, env(safe-area-inset-bottom)))' }}>
+        {!currentOffer ? (
+          <div className="text-center">
+            <Heart className="w-20 h-20 text-violet-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+              Henüz talep yok
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Yakınınızda yeni talepler olduğunda bildireceğiz
+            </p>
+            <button
+              onClick={handleRefresh}
+              className="px-8 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
             >
-              {currentOffer.creator.photo_url ? (
-                <img
-                  src={currentOffer.creator.photo_url}
-                  alt={currentOffer.creator.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-white text-8xl font-bold">
-                    {currentOffer.creator.name.charAt(0).toUpperCase()}
+              <RotateCcw className="w-5 h-5" />
+              Yenile
+            </button>
+          </div>
+        ) : (
+          <div className="relative w-full max-w-md mx-auto">
+            {/* Swipeable Card */}
+            <div
+              ref={cardRef}
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing mb-4"
+              style={{
+                height: 'calc(100vh - 280px)',
+                transform: `translate(${dragOffset.x}px, ${dragOffset.y}px) rotate(${dragOffset.x * 0.1}deg)`,
+                transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+                opacity: Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300)
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Swipe Indicators */}
+              {swipeDirection === 'left' && (
+                <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center z-10">
+                  <div className="bg-red-500 text-white px-6 py-3 rounded-full font-bold text-xl transform rotate-12">
+                    GEÇ
                   </div>
                 </div>
               )}
-              
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-              
-              {/* Profile info */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-white text-2xl font-bold mb-1">
-                  {currentOffer.creator.name}, {currentOffer.creator.age}
-                </h3>
-                <p className="text-white/90">{currentOffer.creator.city}</p>
-              </div>
-
-              {/* Badges */}
-              <div className="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700">
-                {currentOffer.offer_type === 'birebir' ? '👥 Birebir' : '👨‍👩‍👧‍👦 Grup'}
-              </div>
-
-              <div className="absolute top-3 left-3 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl">
-                {getCategoryEmoji(currentOffer.category)}
-              </div>
-
-              {/* Boost badge */}
-              {currentOffer.creator.is_boosted && currentOffer.creator.boost_expires_at && new Date(currentOffer.creator.boost_expires_at) > new Date() && (
-                <div className="absolute top-16 right-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full text-xs font-bold flex items-center gap-1 shadow-lg animate-pulse">
-                  <Zap className="w-3 h-3" />
-                  BOOST
+              {swipeDirection === 'right' && (
+                <div className="absolute inset-0 bg-violet-500/20 flex items-center justify-center z-10">
+                  <div className="bg-gradient-to-r from-violet-500 to-purple-500 text-white px-6 py-3 rounded-full font-bold text-lg transform -rotate-12">
+                    TEKLİF GÖNDER
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Content */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3">
-                {currentOffer.title}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {currentOffer.description}
-              </p>
+              {/* Profile Image */}
+              <div 
+                className="relative h-3/5 bg-gradient-to-br from-violet-200 to-purple-200"
+                onClick={() => setSelectedProfile(currentOffer.creator)}
+              >
+                {currentOffer.creator.photo_url ? (
+                  <img
+                    src={currentOffer.creator.photo_url}
+                    alt={currentOffer.creator.name}
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-white text-8xl font-bold">
+                      {currentOffer.creator.name.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                
+                {/* Profile info */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-white text-2xl font-bold mb-1">
+                    {currentOffer.creator.name}, {currentOffer.creator.age}
+                  </h3>
+                  <p className="text-white/90 text-base">{currentOffer.creator.city}</p>
+                </div>
 
-              {/* Details */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-600">
-                  <Calendar className="w-5 h-5 text-violet-500" />
-                  <span>{formatDate(currentOffer.event_date)}</span>
+                {/* Badges */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm font-semibold text-gray-700">
+                  {currentOffer.offer_type === 'birebir' ? '👥 Birebir' : '👨‍👩‍👧‍👦 Grup'}
                 </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <MapPin className="w-5 h-5 text-violet-500" />
-                  <span>{currentOffer.city}{currentOffer.district && `, ${currentOffer.district}`}</span>
+
+                <div className="absolute top-4 left-4 w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-4xl">
+                  {getCategoryEmoji(currentOffer.category)}
                 </div>
-                {currentOffer.offer_type === 'grup' && (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <Users className="w-5 h-5 text-violet-500" />
-                    <span>{currentOffer.participant_count} kişi</span>
+
+                {/* Boost badge */}
+                {currentOffer.creator.is_boosted && currentOffer.creator.boost_expires_at && new Date(currentOffer.creator.boost_expires_at) > new Date() && (
+                  <div className="absolute top-20 right-4 px-3 py-1 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full text-sm font-bold flex items-center gap-1 shadow-lg animate-pulse">
+                    <Zap className="w-4 h-4" />
+                    BOOST
                   </div>
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={handleSkip}
-                  className="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-600 rounded-xl font-semibold hover:border-gray-400 transition-all"
-                >
-                  Geç
-                </button>
-                <button
-                  onClick={() => setSelectedOffer(currentOffer)}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Send className="w-4 h-4" />
-                  Teklif Gönder
-                </button>
+              {/* Content */}
+              <div className="h-2/5 p-4 flex flex-col">
+                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
+                  {currentOffer.title}
+                </h3>
+                <p className="text-gray-600 mb-4 line-clamp-2 flex-1">
+                  {currentOffer.description}
+                </p>
+
+                {/* Details */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="w-4 h-4 text-violet-500" />
+                    <span>{formatDate(currentOffer.event_date)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <MapPin className="w-4 h-4 text-violet-500" />
+                    <span>{currentOffer.city}{currentOffer.district && `, ${currentOffer.district}`}</span>
+                  </div>
+                  {currentOffer.offer_type === 'grup' && (
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Users className="w-4 h-4 text-violet-500" />
+                      <span>{currentOffer.participant_count} kişi</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+            
+            {/* Action Buttons - Right below the card */}
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={handleSkip}
+                className="flex-1 py-3 px-2 bg-white border-2 border-red-500 text-red-500 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1 hover:scale-105 font-semibold min-h-[48px] text-sm whitespace-nowrap"
+              >
+                <X className="w-4 h-4" />
+                Geç
+              </button>
+              
+              <button
+                onClick={handleLike}
+                className="flex-1 py-3 px-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1 hover:scale-105 font-semibold min-h-[48px] text-sm whitespace-nowrap"
+              >
+                <Heart className="w-4 h-4 fill-current" />
+                Teklif Gönder
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Modals */}
       {selectedOffer && (
