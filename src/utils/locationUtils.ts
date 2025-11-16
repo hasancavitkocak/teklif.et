@@ -60,7 +60,27 @@ export const checkLocationPermission = async (): Promise<LocationPermissionStatu
 export const requestLocationPermission = async (): Promise<boolean> => {
   try {
     if (Capacitor.isNativePlatform()) {
+      // Önce mevcut izinleri kontrol et
+      const currentPermissions = await Geolocation.checkPermissions();
+      console.log('Current permissions:', currentPermissions);
+      
+      if (currentPermissions.location === 'granted') {
+        return true;
+      }
+      
+      // İzin iste
       const result = await Geolocation.requestPermissions();
+      console.log('Permission request result:', result);
+      
+      // Android'de bazen 'prompt' döner, bu durumda tekrar kontrol et
+      if (result.location === 'prompt') {
+        // Kısa bir bekleme sonrası tekrar kontrol et
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const recheckPermissions = await Geolocation.checkPermissions();
+        console.log('Recheck permissions:', recheckPermissions);
+        return recheckPermissions.location === 'granted';
+      }
+      
       return result.location === 'granted';
     } else {
       // Web için getCurrentPosition kullan (permission trigger eder)
@@ -89,10 +109,23 @@ export const requestLocationPermission = async (): Promise<boolean> => {
 export const getCurrentLocation = async (): Promise<LocationInfo | null> => {
   try {
     if (Capacitor.isNativePlatform()) {
-      const position = await Geolocation.getCurrentPosition({
+      // Önce izinleri kontrol et
+      const permissions = await Geolocation.checkPermissions();
+      if (permissions.location !== 'granted') {
+        console.log('Location permission not granted');
+        return null;
+      }
+
+      // Android için daha toleranslı ayarlar
+      const options = {
         enableHighAccuracy: false,
-        timeout: 10000
-      });
+        timeout: 15000,
+        maximumAge: 300000
+      };
+
+      console.log('Getting location with options:', options);
+      const position = await Geolocation.getCurrentPosition(options);
+      console.log('Location obtained:', position);
       
       return {
         latitude: position.coords.latitude,
@@ -120,7 +153,7 @@ export const getCurrentLocation = async (): Promise<LocationInfo | null> => {
           },
           {
             enableHighAccuracy: false,
-            timeout: 10000,
+            timeout: 15000,
             maximumAge: 300000
           }
         );
@@ -149,4 +182,28 @@ export const getPlatformInfo = () => {
     platform: Capacitor.getPlatform(),
     isWeb: !Capacitor.isNativePlatform()
   };
+};
+
+/**
+ * Android için debug bilgilerini döner
+ */
+export const getLocationDebugInfo = async () => {
+  try {
+    const platformInfo = getPlatformInfo();
+    const permissions = await checkLocationPermission();
+    
+    const debugInfo = {
+      platform: platformInfo,
+      permissions: permissions,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      geolocationSupported: 'geolocation' in navigator
+    };
+
+    console.log('Location Debug Info:', debugInfo);
+    return debugInfo;
+  } catch (error) {
+    console.error('Error getting debug info:', error);
+    return null;
+  }
 };

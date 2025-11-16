@@ -1,11 +1,14 @@
-import { MapPin, Shield, X } from 'lucide-react';
+import { MapPin, Shield, X, Info } from 'lucide-react';
 import { useLocation } from '../contexts/LocationContext';
 import { useState } from 'react';
+import { getLocationDebugInfo } from '../utils/locationUtils';
 
 export default function LocationPermissionModal() {
   const { showLocationModal, setShowLocationModal, requestLocationPermission, setLocationPermission } = useLocation();
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState('');
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   if (!showLocationModal) return null;
 
@@ -38,6 +41,12 @@ export default function LocationPermissionModal() {
   const handleDenyLocation = () => {
     setLocationPermission(false);
     setShowLocationModal(false);
+  };
+
+  const handleShowDebug = async () => {
+    const info = await getLocationDebugInfo();
+    setDebugInfo(info);
+    setShowDebug(true);
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -107,7 +116,34 @@ export default function LocationPermissionModal() {
             <p>• Tarayıcı ayarlarından konum iznini açın</p>
             <p>• Uygulama ayarlarından konum erişimini verin</p>
             <p>• Sayfayı yenileyip tekrar deneyin</p>
+            
+            <button
+              onClick={handleShowDebug}
+              className="flex items-center gap-1 text-violet-600 hover:text-violet-700 mt-2"
+            >
+              <Info className="w-3 h-3" />
+              Debug Bilgileri
+            </button>
           </div>
+
+          {showDebug && debugInfo && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-left">
+              <div className="font-semibold mb-2">Debug Bilgileri:</div>
+              <div className="space-y-1">
+                <div>Platform: {debugInfo.platform?.platform}</div>
+                <div>Native: {debugInfo.platform?.isNative ? 'Evet' : 'Hayır'}</div>
+                <div>Mobile: {debugInfo.platform?.isMobile ? 'Evet' : 'Hayır'}</div>
+                <div>İzin Durumu: {debugInfo.permissions?.granted ? 'Verildi' : debugInfo.permissions?.denied ? 'Reddedildi' : 'Bekliyor'}</div>
+                <div>Geolocation Destekli: {debugInfo.geolocationSupported ? 'Evet' : 'Hayır'}</div>
+              </div>
+              <button
+                onClick={() => setShowDebug(false)}
+                className="mt-2 text-violet-600 hover:text-violet-700"
+              >
+                Kapat
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

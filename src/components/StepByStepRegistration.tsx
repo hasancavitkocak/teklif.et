@@ -192,9 +192,9 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
       case 'phone':
         return (
           <div className="text-center">
-            <Phone className="w-16 h-16 text-violet-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Telefon Numaranız</h2>
-            <p className="text-gray-600 mb-6">Güvenlik için telefon numaranızı doğrulayalım</p>
+            <Phone className="w-12 h-12 text-violet-500 mx-auto mb-3" />
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Telefon Numaranız</h2>
+            <p className="text-gray-600 mb-4 text-sm">Güvenlik için telefon numaranızı doğrulayalım</p>
             
             <input
               type="tel"
@@ -756,11 +756,13 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto">
-          {/* Header with Back Button */}
-          <div className="flex items-center justify-between mb-8">
+    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 overflow-hidden">
+      <div className="absolute inset-0 flex flex-col" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))', paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
+        {/* Header */}
+        <div className="px-4 py-2">
+          <div className="max-w-md mx-auto">
+            {/* Header with Back Button */}
+            <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               {onClose && (
                 <button
@@ -771,35 +773,40 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
                 </button>
               )}
               <div>
-                <h1 className="text-xl font-bold text-gray-800">Kayıt Ol</h1>
-                <p className="text-sm text-gray-600">Teklif.et'e katıl</p>
+                <h1 className="text-lg font-bold text-gray-800">Kayıt Ol</h1>
+                <p className="text-xs text-gray-600">Teklif.et'e katıl</p>
               </div>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <div className="flex justify-between text-xs text-gray-500 mb-2">
-              <span>Adım {getStepNumber()}</span>
-              <span>{getStepNumber()}/11</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(getStepNumber() / 11) * 100}%` }}
-              />
+            {/* Progress Bar */}
+            <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
+              <div className="flex justify-between text-xs text-gray-500 mb-2">
+                <span>Adım {getStepNumber()}</span>
+                <span>{getStepNumber()}/11</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(getStepNumber() / 11) * 100}%` }}
+                />
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Main Content */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+        {/* Main Content */}
+        <div className="flex-1 px-4 pb-4">
+          <div className="max-w-md mx-auto h-full">
+            <div className="bg-white rounded-xl shadow-lg p-4 h-full flex flex-col">
             {error && (
               <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-4">
                 {error}
               </div>
             )}
             
-            {renderStep()}
+              {renderStep()}
+            </div>
           </div>
         </div>
       </div>
