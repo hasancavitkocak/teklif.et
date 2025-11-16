@@ -386,15 +386,19 @@ export default function Auth() {
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
                   required
                 />
-                <input
-                  type="date"
-                  placeholder="Doğum Tarihi"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1 ml-1">
+                    Doğum Tarihi
+                  </label>
+                  <input
+                    type="date"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
+                    required
+                  />
+                </div>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as 'erkek' | 'kadın' | 'diğer')}
