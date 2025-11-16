@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useCallback, memo } from 'react';
 import { Edit2, Save, X, LogOut, HelpCircle, Shield, FileText, Cookie, AlertCircle, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -16,7 +16,7 @@ interface ProfileProps {
   onNavigate: (page: 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies') => void;
 }
 
-export default function Profile({ onNavigate }: ProfileProps) {
+function Profile({ onNavigate }: ProfileProps) {
   const { profile, refreshProfile, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -412,3 +412,5 @@ export default function Profile({ onNavigate }: ProfileProps) {
     </div>
   );
 }
+
+export default memo(Profile);

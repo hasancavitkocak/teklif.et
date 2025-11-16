@@ -23,12 +23,12 @@ export default function Dashboard() {
       // Total users
       const { count: totalUsers } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        .select('id', { count: 'exact', head: true });
 
       // Premium users
       const { count: premiumUsers } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('is_premium', true);
 
       // Total offers

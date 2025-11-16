@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Phone, Mail, User, MapPin, Heart, Camera, Shield, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { resizeAndCompressImage, getBase64Size, isFileSizeValid, isImageFile } from '../utils/imageUtils';
 
 type Step = 
   | 'phone' 
@@ -640,36 +641,46 @@ export default function StepByStepRegistration({ onClose }: Props = {}) {
           input.type = 'file';
           input.accept = 'image/*';
           input.multiple = false;
-          input.onchange = (e) => {
+          input.onchange = async (e) => {
             const file = (e.target as HTMLInputElement).files?.[0];
-            if (file) {
-              // Dosya boyutu kontrolü (5MB limit)
-              if (file.size > 5 * 1024 * 1024) {
-                setError('Fotoğraf boyutu 5MB\'dan küçük olmalıdır');
-                return;
-              }
-              
+            if (!file) return;
+
+            try {
               // Dosya tipi kontrolü
-              if (!file.type.startsWith('image/')) {
+              if (!isImageFile(file)) {
                 setError('Lütfen sadece resim dosyası seçin');
                 return;
               }
               
+              // Dosya boyutu kontrolü (10MB limit - resize öncesi)
+              if (!isFileSizeValid(file, 10)) {
+                setError('Fotoğraf boyutu 10MB\'dan küçük olmalıdır');
+                return;
+              }
+              
               setError(''); // Hata mesajını temizle
-              const reader = new FileReader();
-              reader.onload = () => {
-                // Sıralı olarak ekle - boş olan ilk slota ekle
-                const newPhotos = [...photos];
-                const emptyIndex = newPhotos.findIndex(photo => !photo);
-                if (emptyIndex !== -1) {
-                  newPhotos[emptyIndex] = reader.result as string;
-                  setPhotos(newPhotos);
-                }
-              };
-              reader.onerror = () => {
-                setError('Fotoğraf yüklenirken hata oluştu');
-              };
-              reader.readAsDataURL(file);
+              setLoading(true);
+              
+              // Resmi resize et ve sıkıştır
+              const compressedImage = await resizeAndCompressImage(file, 800, 800, 0.8);
+              
+              // Sıkıştırılmış boyutu kontrol et
+              const compressedSizeKB = getBase64Size(compressedImage);
+              console.log(`Orijinal boyut: ${Math.round(file.size / 1024)}KB, Sıkıştırılmış boyut: ${compressedSizeKB}KB`);
+              
+              // Sıralı olarak ekle - boş olan ilk slota ekle
+              const newPhotos = [...photos];
+              const emptyIndex = newPhotos.findIndex(photo => !photo);
+              if (emptyIndex !== -1) {
+                newPhotos[emptyIndex] = compressedImage;
+                setPhotos(newPhotos);
+              }
+              
+            } catch (error) {
+              console.error('Fotoğraf işleme hatası:', error);
+              setError('Fotoğraf işlenirken hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+              setLoading(false);
             }
           };
           input.click();

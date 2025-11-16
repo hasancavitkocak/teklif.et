@@ -56,7 +56,10 @@ export default function Discover() {
       // Get profiles excluding already interacted ones
       let query = supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id, name, age, gender, city, bio, photos, photo_url,
+          is_boosted, boost_expires_at, looking_for, education_level
+        `)
         .neq('id', currentProfile.id)
         .gte('age', filters.minAge)
         .lte('age', filters.maxAge);

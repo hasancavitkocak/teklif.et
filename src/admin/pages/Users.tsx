@@ -26,7 +26,10 @@ export default function Users() {
     try {
       let query = supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id, name, age, gender, city, email, phone,
+          is_premium, is_boosted, created_at, photo_url
+        `)
         .order('created_at', { ascending: false });
 
       if (filterPremium === 'premium') {

@@ -3,6 +3,7 @@ import { X, Loader, Camera, Move } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../contexts/ModalContext';
+import { resizeAndCompressImage, getBase64Size, isFileSizeValid, isImageFile } from '../utils/imageUtils';
 
 const MAX_PHOTOS = 6;
 
@@ -15,7 +16,11 @@ export default function PhotoGallery() {
 
   useEffect(() => {
     if (profile?.photos) {
-      setPhotos(profile.photos);
+      // Sadece dolu fotoğrafları al, boş string'leri filtrele
+      const validPhotos = profile.photos.filter(photo => photo && photo.trim() !== '');
+      setPhotos(validPhotos);
+    } else {
+      setPhotos([]);
     }
   }, [profile?.photos]);
 
@@ -46,32 +51,47 @@ export default function PhotoGallery() {
     input.accept = 'image/*';
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setUploading(true);
-        try {
-          // Gerçek uygulamada burada dosya yükleme işlemi yapılacak
-          // Şimdilik base64 olarak saklıyoruz
-          const reader = new FileReader();
-          reader.onload = async () => {
-            // Sıralı olarak ekle - boş olan ilk slota ekle
-            const newPhotos = [...photos];
-            const emptyIndex = newPhotos.findIndex(photo => !photo);
-            if (emptyIndex !== -1) {
-              newPhotos[emptyIndex] = reader.result as string;
-            } else {
-              // Boş slot yoksa sona ekle
-              newPhotos.push(reader.result as string);
-            }
-            setPhotos(newPhotos);
-            await updatePhotosInDatabase(newPhotos);
-          };
-          reader.readAsDataURL(file);
-        } catch (error) {
-          console.error('Error uploading photo:', error);
-          showToast('error', 'Fotoğraf yüklenirken hata oluştu');
-        } finally {
-          setUploading(false);
+      if (!file) return;
+
+      // Fotoğraf limiti kontrolü
+      if (photos.length >= MAX_PHOTOS) {
+        showToast('error', `En fazla ${MAX_PHOTOS} fotoğraf ekleyebilirsiniz`);
+        return;
+      }
+
+      setUploading(true);
+      try {
+        // Dosya tipi kontrolü
+        if (!isImageFile(file)) {
+          showToast('error', 'Lütfen sadece resim dosyası seçin');
+          return;
         }
+        
+        // Dosya boyutu kontrolü (10MB limit - resize öncesi)
+        if (!isFileSizeValid(file, 10)) {
+          showToast('error', 'Fotoğraf boyutu 10MB\'dan küçük olmalıdır');
+          return;
+        }
+        
+        // Resmi resize et ve sıkıştır
+        const compressedImage = await resizeAndCompressImage(file, 800, 800, 0.8);
+        
+        // Sıkıştırılmış boyutu kontrol et
+        const compressedSizeKB = getBase64Size(compressedImage);
+        console.log(`Orijinal boyut: ${Math.round(file.size / 1024)}KB, Sıkıştırılmış boyut: ${compressedSizeKB}KB`);
+        
+        // Yeni fotoğrafı sona ekle
+        const newPhotos = [...photos, compressedImage];
+        setPhotos(newPhotos);
+        await updatePhotosInDatabase(newPhotos);
+        
+        showToast('success', `Fotoğraf yüklendi (${compressedSizeKB}KB)`);
+        
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        showToast('error', 'Fotoğraf işlenirken hata oluştu');
+      } finally {
+        setUploading(false);
       }
     };
     input.click();
@@ -109,13 +129,14 @@ export default function PhotoGallery() {
     setPhotos(newPhotos);
     await updatePhotosInDatabase(newPhotos);
     setDraggedIndex(null);
+    showToast('success', 'Fotoğraf sırası değiştirildi');
   };
 
   const removePhoto = async (index: number) => {
-    const newPhotos = [...photos];
-    newPhotos.splice(index, 1); // Fotoğrafı sil
+    const newPhotos = photos.filter((_, i) => i !== index);
     setPhotos(newPhotos);
     await updatePhotosInDatabase(newPhotos);
+    showToast('success', 'Fotoğraf silindi');
   };
 
   return (
@@ -126,56 +147,67 @@ export default function PhotoGallery() {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {Array.from({ length: MAX_PHOTOS }).map((_, index) => (
+        {/* Mevcut fotoğraflar - sadece dolu olanları göster */}
+        {photos.map((photo, index) => (
           <div
-            key={index}
-            className={`aspect-square rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all relative ${
-              photos[index]
-                ? 'border-violet-400 bg-violet-50'
-                : 'border-gray-300 hover:border-gray-400'
+            key={`photo-${index}`}
+            draggable={true}
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, index)}
+            className={`aspect-square rounded-xl border-2 border-violet-400 bg-violet-50 flex items-center justify-center cursor-pointer transition-all relative ${
+              draggedIndex === index ? 'opacity-50 scale-95' : 'hover:scale-105'
             }`}
+          >
+            <div className="relative w-full h-full group">
+              <img 
+                src={photo} 
+                alt={`Fotoğraf ${index + 1}`}
+                className="w-full h-full object-cover rounded-xl"
+              />
+              {index === 0 && (
+                <div className="absolute top-2 left-2 bg-violet-500 text-white text-xs px-2 py-1 rounded-full">
+                  Profil
+                </div>
+              )}
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Move className="w-4 h-4 text-white bg-black/50 rounded p-0.5" />
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removePhoto(index);
+                }}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* Fotoğraf ekleme butonu - sadece limit dolmamışsa göster */}
+        {photos.length < MAX_PHOTOS && (
+          <div
+            className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center cursor-pointer transition-all"
             onClick={() => {
-              if (!photos[index] && !uploading) {
-                handlePhotoUpload(index);
+              if (!uploading) {
+                handlePhotoUpload();
               }
             }}
           >
-            {photos[index] ? (
-              <div className="relative w-full h-full">
-                <img 
-                  src={photos[index]} 
-                  alt={`Fotoğraf ${index + 1}`}
-                  className="w-full h-full object-cover rounded-xl"
-                />
-                {index === 0 && (
-                  <div className="absolute top-2 left-2 bg-violet-500 text-white text-xs px-2 py-1 rounded-full">
-                    Profil
-                  </div>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removePhoto(index);
-                  }}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ) : (
-              <div className="text-center">
-                {uploading ? (
-                  <Loader className="w-6 h-6 text-violet-500 animate-spin mx-auto mb-1" />
-                ) : (
-                  <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                )}
-                <span className="text-xs text-gray-500">
-                  {uploading ? 'Yükleniyor...' : 'Ekle'}
-                </span>
-              </div>
-            )}
+            <div className="text-center">
+              {uploading ? (
+                <Loader className="w-6 h-6 text-violet-500 animate-spin mx-auto mb-1" />
+              ) : (
+                <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+              )}
+              <span className="text-xs text-gray-500">
+                {uploading ? 'Yükleniyor...' : 'Ekle'}
+              </span>
+            </div>
           </div>
-        ))}
+        )}
       </div>
 
       <p className="text-xs text-gray-500 text-center">
