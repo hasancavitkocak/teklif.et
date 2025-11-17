@@ -26,6 +26,11 @@
     height: 100vh;
     overflow: hidden;
   }
+  
+  /* Hide navigation bar when keyboard is open */
+  body.keyboard-open .fixed-footer {
+    display: none;
+  }
 
   /* Safe area for bottom (iOS notch & Android navigation) */
   .safe-bottom {

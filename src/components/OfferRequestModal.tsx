@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Send, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';

@@ -132,7 +132,6 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const fetchNextOffer = async () => {
     if (!profile) return;
 
-    setLoading(true);
     try {
       // Expire past offers
       try {
@@ -270,7 +269,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-violet-50 via-white to-purple-50 min-h-screen overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-white to-purple-50 flex flex-col overflow-hidden">
       {refreshing && (
         <div className="fixed top-20 left-0 right-0 flex justify-center z-50">
           <div className="bg-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
@@ -280,31 +279,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         </div>
       )}
 
-      {/* Top Action Bar */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-4">
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Keşfet</h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowCreateOffer(true)}
-                className="p-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
-              >
-                <Plus className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setShowBoostModal(true)}
-                className="p-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
-              >
-                <Zap className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Main Card Area */}
-      <div className="flex items-start justify-center px-4" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="flex-1 flex items-center justify-center px-4 pb-24 overflow-hidden">
         {!currentOffer ? (
           <div className="text-center">
             <Heart className="w-20 h-20 text-violet-300 mx-auto mb-6" />
@@ -324,12 +302,28 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
           </div>
         ) : (
           <div className="relative w-full max-w-md mx-auto">
+            {/* Top Action Buttons */}
+            <div className="flex items-center justify-end gap-2 mb-2">
+              <button
+                onClick={() => setShowCreateOffer(true)}
+                className="p-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setShowBoostModal(true)}
+                className="p-2.5 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
+            </div>
+
             {/* Swipeable Card */}
             <div
               ref={cardRef}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden touch-pan-y mb-4"
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden touch-pan-y"
               style={{
-                height: 'calc(100vh - 280px)',
+                maxHeight: '75vh',
                 transform: isDragging 
                   ? `translate3d(${dragOffset.x}px, ${dragOffset.y * 0.5}px, 0) rotate(${dragOffset.x * 0.05}deg)` 
                   : 'translate3d(0, 0, 0) rotate(0deg)',
@@ -410,16 +404,16 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               </div>
 
               {/* Content */}
-              <div className="h-2/5 p-4 flex flex-col">
-                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
+              <div className="flex-shrink-0 p-4 flex flex-col bg-white">
+                <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1">
                   {currentOffer.title}
                 </h3>
-                <p className="text-gray-600 mb-4 line-clamp-2 flex-1">
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {currentOffer.description}
                 </p>
 
                 {/* Details */}
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1.5 text-sm">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4 text-violet-500" />
                     <span>{formatDate(currentOffer.event_date)}</span>
@@ -438,8 +432,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               </div>
             </div>
             
-            {/* Action Buttons - Right below the card */}
-            <div className="flex items-center justify-center gap-3">
+            {/* Action Buttons - Fixed above navigation */}
+            <div className="fixed bottom-[136px] left-0 right-0 flex items-center justify-center gap-3 px-4 z-10 max-w-md mx-auto">
               <button
                 onClick={handleSkip}
                 className="flex-1 py-3 px-2 bg-white border-2 border-red-500 text-red-500 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1 hover:scale-105 font-semibold min-h-[48px] text-sm whitespace-nowrap"
@@ -474,31 +468,29 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       )}
 
       {showCreateOffer && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
-          <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="bg-gradient-to-br from-violet-50 via-white to-purple-50 rounded-3xl shadow-2xl max-w-2xl w-full my-8">
-              <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 rounded-t-3xl flex items-center justify-between z-10">
-                <h2 className="text-xl font-bold text-gray-800">Yeni Talep Oluştur</h2>
-                <button
-                  onClick={() => setShowCreateOffer(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-all"
-                >
-                  <X className="w-6 h-6 text-gray-600" />
-                </button>
-              </div>
-              <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-                <CreateOfferWizard 
-                  onSuccess={() => {
-                    setShowCreateOffer(false);
-                    setShowOfferCreatedPopup(true);
-                    fetchNextOffer();
-                  }}
-                  onNavigate={(page) => {
-                    setShowCreateOffer(false);
-                    onNavigate?.(page);
-                  }} 
-                />
-              </div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3">
+          <div className="bg-gradient-to-br from-violet-50 via-white to-purple-50 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+            <div className="flex-shrink-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 rounded-t-2xl flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-800">Yeni Talep Oluştur</h2>
+              <button
+                onClick={() => setShowCreateOffer(false)}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="flex-1 p-4 overflow-y-auto">
+              <CreateOfferWizard 
+                onSuccess={() => {
+                  setShowCreateOffer(false);
+                  setShowOfferCreatedPopup(true);
+                  fetchNextOffer();
+                }}
+                onNavigate={(page) => {
+                  setShowCreateOffer(false);
+                  onNavigate?.(page);
+                }} 
+              />
             </div>
           </div>
         </div>
