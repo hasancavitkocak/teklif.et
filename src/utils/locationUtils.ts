@@ -62,7 +62,7 @@ export const requestLocationPermission = async (): Promise<boolean> => {
     if (Capacitor.isNativePlatform()) {
       // Önce mevcut izinleri kontrol et
       const currentPermissions = await Geolocation.checkPermissions();
-      console.log('Current permissions:', currentPermissions);
+      // Check current permissions
       
       if (currentPermissions.location === 'granted') {
         return true;
@@ -70,14 +70,14 @@ export const requestLocationPermission = async (): Promise<boolean> => {
       
       // İzin iste
       const result = await Geolocation.requestPermissions();
-      console.log('Permission request result:', result);
+      // Request permissions
       
       // Android'de bazen 'prompt' döner, bu durumda tekrar kontrol et
       if (result.location === 'prompt') {
         // Kısa bir bekleme sonrası tekrar kontrol et
         await new Promise(resolve => setTimeout(resolve, 1000));
         const recheckPermissions = await Geolocation.checkPermissions();
-        console.log('Recheck permissions:', recheckPermissions);
+        // Recheck permissions after prompt
         return recheckPermissions.location === 'granted';
       }
       
@@ -112,7 +112,7 @@ export const getCurrentLocation = async (): Promise<LocationInfo | null> => {
       // Önce izinleri kontrol et
       const permissions = await Geolocation.checkPermissions();
       if (permissions.location !== 'granted') {
-        console.log('Location permission not granted');
+        // Location permission not granted
         return null;
       }
 
@@ -123,9 +123,7 @@ export const getCurrentLocation = async (): Promise<LocationInfo | null> => {
         maximumAge: 300000
       };
 
-      console.log('Getting location with options:', options);
       const position = await Geolocation.getCurrentPosition(options);
-      console.log('Location obtained:', position);
       
       return {
         latitude: position.coords.latitude,
@@ -200,7 +198,7 @@ export const getLocationDebugInfo = async () => {
       geolocationSupported: 'geolocation' in navigator
     };
 
-    console.log('Location Debug Info:', debugInfo);
+    // Debug info collected
     return debugInfo;
   } catch (error) {
     console.error('Error getting debug info:', error);

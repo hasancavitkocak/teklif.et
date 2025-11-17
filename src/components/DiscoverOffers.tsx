@@ -25,6 +25,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [skippedOfferIds, setSkippedOfferIds] = useState<string[]>([]);
+  // NextOffer state kaldırıldı - basit optimizasyon
 
   // Swipe functionality
   const cardRef = useRef<HTMLDivElement>(null);
@@ -59,10 +60,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
           table: 'profiles',
         },
         (payload) => {
-          console.log('👤 Profile updated:', payload);
-          // Eğer mevcut teklifteki creator güncellendiyse, teklifi yenile
+          // Profile updated - refresh offer if needed
           if (currentOffer && payload.new.id === currentOffer.creator_id) {
-            console.log('🔄 Refreshing current offer due to creator profile update');
             fetchNextOffer();
           }
         }
@@ -83,7 +82,11 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
   const handleSkip = () => {
     if (currentOffer) {
+      // Skip edilen ID'yi ekle
       setSkippedOfferIds(prev => [...prev, currentOffer.id]);
+
+      // Hızlı geçiş için loading'i kısa tut
+      setCurrentOffer(null);
       fetchNextOffer();
     }
   };
@@ -97,7 +100,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   // Swipe handlers - Optimized for performance
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!currentOffer) return;
-    e.preventDefault();
+    // preventDefault kaldırıldı - passive event listener uyumluluğu için
     setIsDragging(true);
     setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     setDragOffset({ x: 0, y: 0 });
@@ -106,7 +109,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !currentOffer) return;
-    e.preventDefault();
+    // preventDefault kaldırıldı - passive event listener uyumluluğu için
 
     // Throttle move events for better performance
     const now = Date.now();
@@ -133,11 +136,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     if (!isDragging || !currentOffer) return;
-    e.preventDefault();
 
-    const threshold = 80; // Daha düşük threshold
+    const threshold = 60; // Daha düşük threshold - daha hızlı tepki
     const velocity = Math.abs(dragOffset.x);
 
     if (velocity > threshold) {
@@ -159,41 +161,31 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     setSwipeDirection(null);
   };
 
+  // Preload fonksiyonu kaldırıldı - basit optimizasyon
+
   const fetchNextOffer = async () => {
     if (!profile) return;
 
     try {
-      // Expire past offers
-      try {
-        await supabase.rpc('expire_past_offers');
-      } catch (e) {
-        // Ignore errors
-      }
+      // Sadece kullanıcının gönderdiği talepleri al (daha hızlı)
+      const { data: myRequests } = await supabase
+        .from('offer_requests')
+        .select('offer_id')
+        .eq('requester_id', profile.id);
 
-      // Get user's requests and accepted offers
-      const [myRequestsResult, acceptedRequestsResult] = await Promise.all([
-        supabase
-          .from('offer_requests')
-          .select('offer_id, status')
-          .eq('requester_id', profile.id),
-        supabase
-          .from('offer_requests')
-          .select('offer_id')
-          .eq('status', 'accepted')
-      ]);
+      const requestedOfferIds = myRequests?.map(r => r.offer_id) || [];
+      const excludedIds = [...requestedOfferIds, ...skippedOfferIds];
 
-      const requestedOfferIds = myRequestsResult.data?.map(r => r.offer_id) || [];
-      const acceptedOfferIds = acceptedRequestsResult.data?.map(r => r.offer_id) || [];
-      const excludedIds = [...requestedOfferIds, ...acceptedOfferIds, ...skippedOfferIds];
+      // RPC çağrısı kaldırıldı - performans optimizasyonu
 
-      // Fetch single offer with optimized query
+      // Optimize edilmiş query
       const query = supabase
         .from('activity_offers')
         .select(`
           *,
           creator:creator_id(
-            id, name, age, city, 
-            photo_url, photos, is_boosted, boost_expires_at
+            id, name, age, city, photo_url, photos, 
+            is_boosted, boost_expires_at
           )
         `)
         .eq('status', 'active')
@@ -207,22 +199,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
-      }
-
-      console.log('📋 Fetched offer:', data);
-      if (data?.creator) {
-        console.log('👤 Creator info:', {
-          id: data.creator.id,
-          name: data.creator.name,
-          photo_url: data.creator.photo_url,
-          photos: data.creator.photos,
-          hasPhoto: !!data.creator.photo_url,
-          hasPhotos: !!(data.creator.photos && data.creator.photos.length > 0)
-        });
       }
 
       setCurrentOffer(data || null);
@@ -363,9 +343,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             {/* Swipeable Card */}
             <div
               ref={cardRef}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden touch-pan-y"
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden"
               style={{
                 maxHeight: '75vh',
+                touchAction: 'pan-x', // Sadece yatay kaydırmaya izin ver
                 transform: isDragging
                   ? `translate3d(${dragOffset.x}px, ${dragOffset.y * 0.5}px, 0) rotate(${dragOffset.x * 0.05}deg)`
                   : 'translate3d(0, 0, 0) rotate(0deg)',
@@ -406,7 +387,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                       ? currentOffer.creator.photos[0]
                       : null);
 
-                  console.log('🖼️ Profile image to display:', profileImage);
+                  // Profile image debug removed
 
                   return profileImage ? (
                     <img
@@ -414,8 +395,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                       alt={currentOffer.creator.name}
                       className="w-full h-full object-cover"
                       draggable={false}
-                      onLoad={() => console.log('✅ Profile image loaded:', profileImage)}
-                      onError={() => console.log('❌ Profile image failed to load:', profileImage)}
+                      onLoad={() => { }}
+                      onError={() => { }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-400 to-purple-500">

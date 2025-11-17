@@ -46,15 +46,12 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
     setLocationError('');
     
     try {
-      console.log('🌍 Getting current location for city...');
       const location = await getCurrentLocation();
       
       if (!location) {
         throw new Error('Konum alınamadı');
       }
 
-      console.log('📍 Location obtained:', location);
-      
       // Reverse geocoding ile şehir bilgisini al
       const response = await fetch(
         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.latitude}&longitude=${location.longitude}&localityLanguage=tr`
@@ -65,12 +62,9 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
       }
       
       const data = await response.json();
-      console.log('🏙️ Geocoding result:', data);
-      
       const city = data.city || data.locality || data.principalSubdivision || 'Bilinmeyen Şehir';
       
       setFormData(prev => ({ ...prev, city }));
-      console.log('✅ City updated:', city);
       
     } catch (error) {
       console.error('❌ Location error:', error);
@@ -111,9 +105,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
     setLoading(true);
 
     try {
-      console.log('Creating offer with data:', formData);
       const eventDateTime = new Date(`${formData.event_date}T${formData.event_time}`);
-      console.log('Event date time:', eventDateTime.toISOString());
       
       const offerData = {
         creator_id: profile.id,
@@ -129,8 +121,6 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
         status: 'active' as const,
       };
 
-      console.log('Inserting offer:', offerData);
-
       const { data, error: insertError } = await supabase
         .from('activity_offers')
         .insert(offerData)
@@ -141,8 +131,6 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
         console.error('Insert error:', insertError);
         throw insertError;
       }
-
-      console.log('Offer created successfully:', data);
       onSuccess?.(); // Call onSuccess callback to refresh parent
     } catch (err: any) {
       console.error('Error creating offer:', err);
