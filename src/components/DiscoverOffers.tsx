@@ -377,7 +377,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
               {/* Profile Image */}
               <div
-                className="relative h-3/5 bg-gradient-to-br from-violet-200 to-purple-200"
+                className="relative h-3/5 bg-gradient-to-br from-violet-200 to-purple-200 overflow-hidden"
                 onClick={() => setSelectedProfile(currentOffer.creator)}
               >
                 {(() => {
@@ -393,7 +393,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                     <img
                       src={profileImage}
                       alt={currentOffer.creator.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
+                      style={{ aspectRatio: '1/1' }}
                       draggable={false}
                       onLoad={() => { }}
                       onError={() => { }}
