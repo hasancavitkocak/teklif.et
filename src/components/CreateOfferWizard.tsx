@@ -1,7 +1,8 @@
-﻿import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Calendar, MapPin, Users } from 'lucide-react';
+﻿import { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowRight, Check, Calendar, MapPin, Users, Loader } from 'lucide-react';
 import { supabase, ActivityOffer } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { getCurrentLocation } from '../utils/locationUtils';
 
 const categories = [
   { value: 'kahve', label: 'Kahve', emoji: '☕' },
@@ -22,6 +23,8 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
   const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState('');
   
   const [formData, setFormData] = useState({
     category: '' as ActivityOffer['category'] | '',
@@ -36,6 +39,55 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
   });
 
   const totalSteps = 4;
+
+  // Konum bilgisini al
+  const getCurrentCity = async () => {
+    setLocationLoading(true);
+    setLocationError('');
+    
+    try {
+      console.log('🌍 Getting current location for city...');
+      const location = await getCurrentLocation();
+      
+      if (!location) {
+        throw new Error('Konum alınamadı');
+      }
+
+      console.log('📍 Location obtained:', location);
+      
+      // Reverse geocoding ile şehir bilgisini al
+      const response = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.latitude}&longitude=${location.longitude}&localityLanguage=tr`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Şehir bilgisi alınamadı');
+      }
+      
+      const data = await response.json();
+      console.log('🏙️ Geocoding result:', data);
+      
+      const city = data.city || data.locality || data.principalSubdivision || 'Bilinmeyen Şehir';
+      
+      setFormData(prev => ({ ...prev, city }));
+      console.log('✅ City updated:', city);
+      
+    } catch (error) {
+      console.error('❌ Location error:', error);
+      setLocationError('Konum alınamadı. Lütfen manuel olarak girin.');
+      // Fallback olarak profil şehrini kullan
+      setFormData(prev => ({ ...prev, city: profile?.city || '' }));
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  // 3. adıma geçildiğinde konum al
+  useEffect(() => {
+    if (currentStep === 3 && !formData.city) {
+      getCurrentCity();
+    }
+  }, [currentStep]);
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -251,32 +303,48 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  Şehir
-                </label>
+            <div>
+              <label className="block text-sm font-bold text-gray-800 mb-2">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Şehir
+              </label>
+              <div className="relative">
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="İstanbul"
-                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
+                  placeholder="Konum alınıyor..."
+                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all pr-10"
+                  disabled={locationLoading}
                 />
+                {locationLoading && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Loader className="w-4 h-4 animate-spin text-violet-500" />
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">
-                  Semt
-                </label>
-                <input
-                  type="text"
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  placeholder="Kadıköy"
-                  className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
-                />
-              </div>
+              {locationError && (
+                <p className="text-xs text-red-500 mt-1">{locationError}</p>
+              )}
+              <button
+                type="button"
+                onClick={getCurrentCity}
+                disabled={locationLoading}
+                className="text-xs text-violet-600 hover:text-violet-700 mt-1 disabled:opacity-50 mb-3"
+              >
+                {locationLoading ? 'Konum alınıyor...' : '📍 Mevcut konumu kullan'}
+              </button>
+              
+              <label className="block text-sm font-bold text-gray-800 mb-2">
+                Mekan İsmi
+              </label>
+              <input
+                type="text"
+                value={formData.district}
+                onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                placeholder="Lens Avm - Starbucks"
+                className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all"
+              />
             </div>
           </div>
         )}
@@ -346,7 +414,7 @@ export default function CreateOfferWizard({ onSuccess }: Props) {
                 <p><strong>Kategori:</strong> {categories.find(c => c.value === formData.category)?.label}</p>
                 <p><strong>Başlık:</strong> {formData.title}</p>
                 <p><strong>Tarih:</strong> {formData.event_date} {formData.event_time}</p>
-                <p><strong>Konum:</strong> {formData.city}{formData.district && `, ${formData.district}`}</p>
+                <p><strong>Konum:</strong> {formData.city}{formData.district && ` - ${formData.district}`}</p>
                 <p><strong>Tür:</strong> {formData.offer_type === 'birebir' ? 'Birebir' : `Grup (${formData.participant_count} kişi)`}</p>
               </div>
             </div>

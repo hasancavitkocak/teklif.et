@@ -25,7 +25,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [skippedOfferIds, setSkippedOfferIds] = useState<string[]>([]);
-  
+
   // Swipe functionality
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -43,6 +43,36 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
       }
     }
   }, [profile?.id, hasLocationPermission]);
+
+  // Real-time subscription for profile updates
+  useEffect(() => {
+    if (!profile) return;
+
+    // Profiles tablosundaki değişiklikleri dinle
+    const profileSubscription = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+        },
+        (payload) => {
+          console.log('👤 Profile updated:', payload);
+          // Eğer mevcut teklifteki creator güncellendiyse, teklifi yenile
+          if (currentOffer && payload.new.id === currentOffer.creator_id) {
+            console.log('🔄 Refreshing current offer due to creator profile update');
+            fetchNextOffer();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      profileSubscription.unsubscribe();
+    };
+  }, [profile?.id, currentOffer?.creator_id]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -77,21 +107,21 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !currentOffer) return;
     e.preventDefault();
-    
+
     // Throttle move events for better performance
     const now = Date.now();
     if (now - lastMoveTime < 16) return; // ~60fps
     setLastMoveTime(now);
-    
+
     const deltaX = e.touches[0].clientX - dragStart.x;
     const deltaY = e.touches[0].clientY - dragStart.y;
-    
+
     // Sadece yatay hareketi izin ver, dikey hareketi sınırla
     const constrainedDeltaX = Math.max(-200, Math.min(200, deltaX));
     const constrainedDeltaY = Math.max(-30, Math.min(30, deltaY));
-    
+
     setDragOffset({ x: constrainedDeltaX, y: constrainedDeltaY });
-    
+
     // Swipe direction - daha hassas threshold
     if (Math.abs(constrainedDeltaX) > 40) {
       const newDirection = constrainedDeltaX > 0 ? 'right' : 'left';
@@ -106,10 +136,10 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isDragging || !currentOffer) return;
     e.preventDefault();
-    
+
     const threshold = 80; // Daha düşük threshold
     const velocity = Math.abs(dragOffset.x);
-    
+
     if (velocity > threshold) {
       if (dragOffset.x > 0) {
         // Swipe right - Like
@@ -119,7 +149,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
         handleSkip();
       }
     }
-    
+
     resetDrag();
   };
 
@@ -163,7 +193,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
           *,
           creator:creator_id(
             id, name, age, city, 
-            photo_url, is_boosted, boost_expires_at
+            photo_url, photos, is_boosted, boost_expires_at
           )
         `)
         .eq('status', 'active')
@@ -181,6 +211,18 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
       if (error && error.code !== 'PGRST116') {
         throw error;
+      }
+
+      console.log('📋 Fetched offer:', data);
+      if (data?.creator) {
+        console.log('👤 Creator info:', {
+          id: data.creator.id,
+          name: data.creator.name,
+          photo_url: data.creator.photo_url,
+          photos: data.creator.photos,
+          hasPhoto: !!data.creator.photo_url,
+          hasPhotos: !!(data.creator.photos && data.creator.photos.length > 0)
+        });
       }
 
       setCurrentOffer(data || null);
@@ -203,8 +245,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return `Yarın ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
     } else {
-      return date.toLocaleDateString('tr-TR', { 
-        day: 'numeric', 
+      return date.toLocaleDateString('tr-TR', {
+        day: 'numeric',
         month: 'long',
         hour: '2-digit',
         minute: '2-digit'
@@ -324,8 +366,8 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               className="bg-white rounded-3xl shadow-2xl overflow-hidden touch-pan-y"
               style={{
                 maxHeight: '75vh',
-                transform: isDragging 
-                  ? `translate3d(${dragOffset.x}px, ${dragOffset.y * 0.5}px, 0) rotate(${dragOffset.x * 0.05}deg)` 
+                transform: isDragging
+                  ? `translate3d(${dragOffset.x}px, ${dragOffset.y * 0.5}px, 0) rotate(${dragOffset.x * 0.05}deg)`
                   : 'translate3d(0, 0, 0) rotate(0deg)',
                 transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 opacity: isDragging ? Math.max(0.8, 1 - Math.abs(dragOffset.x) / 250) : 1,
@@ -337,17 +379,15 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             >
               {/* Swipe Indicators - Optimized */}
               {swipeDirection && (
-                <div 
-                  className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-150 ${
-                    swipeDirection === 'left' ? 'bg-red-500/15' : 'bg-violet-500/15'
-                  }`}
-                >
-                  <div 
-                    className={`px-4 py-2 rounded-full font-bold text-lg transform transition-transform duration-150 ${
-                      swipeDirection === 'left' 
-                        ? 'bg-red-500 text-white rotate-12' 
-                        : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white -rotate-12'
+                <div
+                  className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-150 ${swipeDirection === 'left' ? 'bg-red-500/15' : 'bg-violet-500/15'
                     }`}
+                >
+                  <div
+                    className={`px-4 py-2 rounded-full font-bold text-lg transform transition-transform duration-150 ${swipeDirection === 'left'
+                      ? 'bg-red-500 text-white rotate-12'
+                      : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white -rotate-12'
+                      }`}
                   >
                     {swipeDirection === 'left' ? 'GEÇ' : 'TEKLİF GÖNDER'}
                   </div>
@@ -355,28 +395,40 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               )}
 
               {/* Profile Image */}
-              <div 
+              <div
                 className="relative h-3/5 bg-gradient-to-br from-violet-200 to-purple-200"
                 onClick={() => setSelectedProfile(currentOffer.creator)}
               >
-                {currentOffer.creator.photo_url ? (
-                  <img
-                    src={currentOffer.creator.photo_url}
-                    alt={currentOffer.creator.name}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-white text-8xl font-bold">
-                      {currentOffer.creator.name.charAt(0).toUpperCase()}
+                {(() => {
+                  // Profil resmini al: önce photo_url, sonra photos array'inden ilki
+                  const profileImage = currentOffer.creator.photo_url ||
+                    (currentOffer.creator.photos && currentOffer.creator.photos.length > 0
+                      ? currentOffer.creator.photos[0]
+                      : null);
+
+                  console.log('🖼️ Profile image to display:', profileImage);
+
+                  return profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt={currentOffer.creator.name}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                      onLoad={() => console.log('✅ Profile image loaded:', profileImage)}
+                      onError={() => console.log('❌ Profile image failed to load:', profileImage)}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-400 to-purple-500">
+                      <div className="text-white text-8xl font-bold">
+                        {currentOffer.creator.name.charAt(0).toUpperCase()}
+                      </div>
                     </div>
-                  </div>
-                )}
-                
+                  );
+                })()}
+
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                
+
                 {/* Profile info */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white text-2xl font-bold mb-1">
@@ -431,7 +483,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 </div>
               </div>
             </div>
-            
+
             {/* Action Buttons - Fixed above navigation */}
             <div className="fixed bottom-[136px] left-0 right-0 flex items-center justify-center gap-3 px-4 z-10 max-w-md mx-auto">
               <button
@@ -441,7 +493,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 <X className="w-4 h-4" />
                 Geç
               </button>
-              
+
               <button
                 onClick={handleLike}
                 className="flex-1 py-3 px-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1 hover:scale-105 font-semibold min-h-[48px] text-sm whitespace-nowrap"
@@ -480,7 +532,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
               </button>
             </div>
             <div className="flex-1 p-4 overflow-y-auto">
-              <CreateOfferWizard 
+              <CreateOfferWizard
                 onSuccess={() => {
                   setShowCreateOffer(false);
                   setShowOfferCreatedPopup(true);
@@ -489,7 +541,7 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 onNavigate={(page) => {
                   setShowCreateOffer(false);
                   onNavigate?.(page);
-                }} 
+                }}
               />
             </div>
           </div>
