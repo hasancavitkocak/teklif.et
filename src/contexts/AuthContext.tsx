@@ -157,7 +157,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    initializeAuth();
+    // Timeout ekle - 10 saniye sonra loading'i false yap
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        console.warn('Auth initialization timeout - setting loading to false');
+        setLoading(false);
+      }
+    }, 10000);
+
+    initializeAuth().finally(() => {
+      clearTimeout(timeoutId);
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;

@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ModalProvider } from './contexts/ModalContext';
 import { LocationProvider } from './contexts/LocationContext';
 import LocationPermissionModal from './components/LocationPermissionModal';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useNotifications } from './hooks/useNotifications';
 import { useCapacitor } from './hooks/useCapacitor';
 import { usePushNotifications } from './hooks/usePushNotifications';
@@ -36,6 +37,11 @@ function AppContent() {
   // Check URL for admin route
   const isAdminRoute = window.location.pathname === '/admin';
   const [currentPage, setCurrentPage] = useState<Page>(isAdminRoute ? 'admin' : 'discover');
+
+  // Debug logging for mobile
+  useEffect(() => {
+    console.log('AppContent - loading:', loading, 'user:', !!user);
+  }, [loading, user]);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -119,13 +125,15 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <ModalProvider>
-        <LocationProvider>
-          <AppContent />
-        </LocationProvider>
-      </ModalProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ModalProvider>
+          <LocationProvider>
+            <AppContent />
+          </LocationProvider>
+        </ModalProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
