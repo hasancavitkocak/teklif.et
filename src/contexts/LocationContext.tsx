@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { checkLocationPermission, requestLocationPermission as requestPermission, getCurrentLocation, getPlatformInfo } from '../utils/locationUtils';
+import { supabase } from '../lib/supabase';
 
 type LocationContextType = {
   hasLocationPermission: boolean;
@@ -15,7 +16,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
 
-  // Sayfa yüklendiğinde permission durumunu kontrol et
+  // Sayfa yüklendiğinde permission durumunu kontrol et ve konum al
   useEffect(() => {
     const checkInitialPermission = async () => {
       try {
@@ -23,6 +24,26 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         const savedPermission = localStorage.getItem('locationPermission');
         if (savedPermission === 'true') {
           setHasLocationPermission(true);
+          
+          // Konum bilgisini güncelle
+          try {
+            const location = await getCurrentLocation();
+            if (location) {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                await supabase
+                  .from('profiles')
+                  .update({
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                  })
+                  .eq('id', user.id);
+                console.log('✅ Konum güncellendi:', location);
+              }
+            }
+          } catch (error) {
+            console.log('Error updating location:', error);
+          }
           return;
         }
 
@@ -62,10 +83,33 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       console.log('Permission request result:', granted);
       
       if (granted) {
-        // Test için konum al
+        // Konum al
         const location = await getCurrentLocation();
         if (location) {
           console.log('Location obtained:', location);
+          
+          // Kullanıcının profiline konum bilgisini kaydet
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              const { error } = await supabase
+                .from('profiles')
+                .update({
+                  latitude: location.latitude,
+                  longitude: location.longitude
+                })
+                .eq('id', user.id);
+              
+              if (error) {
+                console.error('Error saving location to profile:', error);
+              } else {
+                console.log('✅ Konum profile kaydedildi:', location);
+              }
+            }
+          } catch (error) {
+            console.error('Error updating profile with location:', error);
+          }
+          
           setLocationPermission(true);
           return true;
         } else {

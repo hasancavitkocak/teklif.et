@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { MapPin, Calendar, Users, Heart, Zap, CheckCircle, ArrowRight, Plus, X, RotateCcw } from 'lucide-react';
+import { MapPin, Calendar, Users, Heart, Zap, CheckCircle, ArrowRight, Plus, X, RotateCcw, Sliders } from 'lucide-react';
 import { supabase, ActivityOffer, Profile } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
@@ -25,7 +25,11 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
   const [showOfferCreatedPopup, setShowOfferCreatedPopup] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [skippedOfferIds, setSkippedOfferIds] = useState<string[]>([]);
-  // NextOffer state kaldırıldı - basit optimizasyon
+  
+  // Filter states
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [distanceRadius, setDistanceRadius] = useState<number>(30); // km default
 
   // Swipe functionality
   const cardRef = useRef<HTMLDivElement>(null);
@@ -185,21 +189,75 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
           *,
           creator:creator_id(
             id, name, age, city, photo_url, photos, 
-            is_boosted, boost_expires_at
+            is_boosted, boost_expires_at, latitude, longitude
           )
         `)
         .eq('status', 'active')
         .neq('creator_id', profile.id)
         .gte('event_date', new Date().toISOString());
 
+      // Apply category filter
+      if (selectedCategories.length > 0) {
+        query.in('category', selectedCategories);
+      }
+
       if (excludedIds.length > 0) {
         query.not('id', 'in', `(${excludedIds.join(',')})`);
       }
 
-      const { data, error } = await query
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Fetch multiple for distance filtering
+      const { data: offers, error } = await query
+        .order('created_at', { ascending: false})
+        .limit(50);
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      // Filter by distance
+      let filteredOffers = offers || [];
+      
+      console.log('📍 Mesafe Filtresi Debug:', {
+        userLocation: { lat: profile.latitude, lon: profile.longitude },
+        distanceRadius,
+        totalOffers: filteredOffers.length
+      });
+
+      if (profile.latitude && profile.longitude && filteredOffers.length > 0) {
+        const beforeFilter = filteredOffers.length;
+        filteredOffers = filteredOffers.filter(offer => {
+          if (!offer.latitude || !offer.longitude) {
+            console.log('⚠️ Teklif konum bilgisi yok:', offer.id, offer.creator.name);
+            return false;
+          }
+          const distance = calculateDistance(
+            profile.latitude!,
+            profile.longitude!,
+            offer.latitude,
+            offer.longitude
+          );
+          
+          console.log('📏 Mesafe hesaplandı:', {
+            offer: offer.creator.name,
+            offerLocation: { lat: offer.latitude, lon: offer.longitude },
+            distance: distance.toFixed(2) + ' km',
+            limit: distanceRadius + ' km',
+            included: distance <= distanceRadius
+          });
+          
+          return distance <= distanceRadius;
+        });
+        
+        console.log('✅ Filtre sonucu:', {
+          before: beforeFilter,
+          after: filteredOffers.length,
+          filtered: beforeFilter - filteredOffers.length
+        });
+      } else {
+        console.log('⚠️ Kullanıcı konum bilgisi yok veya teklif yok');
+      }
+
+      const data = filteredOffers[0] || null;
 
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -212,6 +270,19 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Calculate distance (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
 
   const formatDate = (dateString: string) => {
@@ -305,27 +376,20 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
 
       {/* Main Card Area */}
       <div className="flex-1 flex items-center justify-center px-4 pb-24 overflow-hidden">
-        {!currentOffer ? (
-          <div className="text-center">
-            <Heart className="w-20 h-20 text-violet-300 mx-auto mb-6" />
-            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-              Henüz talep yok
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Yakınınızda yeni talepler olduğunda bildireceğiz
-            </p>
+        <div className="relative w-full max-w-md mx-auto">
+          {/* Top Action Buttons - Always visible */}
+          <div className="flex items-center justify-between gap-2 mb-2">
             <button
-              onClick={handleRefresh}
-              className="px-8 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+              onClick={() => setShowFilterModal(true)}
+              className="p-2.5 bg-white border-2 border-violet-500 text-violet-500 rounded-full shadow-lg hover:shadow-xl transition-all relative"
             >
-              <RotateCcw className="w-5 h-5" />
-              Yenile
+              <Sliders className="w-5 h-5" />
+              {(selectedCategories.length > 0 || distanceRadius < 30) && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              )}
             </button>
-          </div>
-        ) : (
-          <div className="relative w-full max-w-md mx-auto">
-            {/* Top Action Buttons */}
-            <div className="flex items-center justify-end gap-2 mb-2">
+            
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowCreateOffer(true)}
                 className="p-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
@@ -339,6 +403,27 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 <Zap className="w-5 h-5" />
               </button>
             </div>
+          </div>
+
+          {!currentOffer ? (
+            <div className="text-center mt-20">
+              <Heart className="w-20 h-20 text-violet-300 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                Henüz talep yok
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Yakınınızda yeni talepler olduğunda bildireceğiz
+              </p>
+              <button
+                onClick={handleRefresh}
+                className="px-8 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Yenile
+              </button>
+            </div>
+          ) : (
+            <div className="relative w-full">
 
             {/* Swipeable Card */}
             <div
@@ -484,8 +569,9 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
                 Teklif Gönder
               </button>
             </div>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modals */}
@@ -499,6 +585,114 @@ export default function DiscoverOffers({ onNavigate }: Props = {}) {
             fetchNextOffer();
           }}
         />
+      )}
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-800">Filtrele</h3>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Category Filter */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                Talep Türü {selectedCategories.length > 0 && `(${selectedCategories.length} seçili)`}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setSelectedCategories([])}
+                  className={`p-3 rounded-xl border-2 transition-all text-sm font-medium flex items-center gap-2 ${
+                    selectedCategories.length === 0
+                      ? 'border-violet-500 bg-violet-50 text-violet-700'
+                      : 'border-gray-200 hover:border-violet-300 text-gray-700'
+                  }`}
+                >
+                  <span className="text-lg">✨</span>
+                  <span>Tümü</span>
+                </button>
+                {[
+                  { value: 'kahve', label: 'Kahve', emoji: '☕' },
+                  { value: 'yemek', label: 'Yemek', emoji: '🍽️' },
+                  { value: 'spor', label: 'Spor', emoji: '⚽' },
+                  { value: 'sinema', label: 'Sinema', emoji: '🎬' },
+                  { value: 'gezi', label: 'Gezi', emoji: '🗺️' },
+                  { value: 'konser', label: 'Konser', emoji: '🎵' },
+                  { value: 'diger', label: 'Diğer', emoji: '🎯' },
+                ].map((cat) => (
+                  <button
+                    key={cat.value}
+                    onClick={() => {
+                      if (selectedCategories.includes(cat.value)) {
+                        setSelectedCategories(selectedCategories.filter(c => c !== cat.value));
+                      } else {
+                        setSelectedCategories([...selectedCategories, cat.value]);
+                      }
+                    }}
+                    className={`p-3 rounded-xl border-2 transition-all text-sm font-medium flex items-center gap-2 ${
+                      selectedCategories.includes(cat.value)
+                        ? 'border-violet-500 bg-violet-50 text-violet-700'
+                        : 'border-gray-200 hover:border-violet-300 text-gray-700'
+                    }`}
+                  >
+                    <span className="text-lg">{cat.emoji}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Distance Filter */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Mesafe: {distanceRadius} km
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="100"
+                step="1"
+                value={distanceRadius}
+                onChange={(e) => setDistanceRadius(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-violet-500"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1 km</span>
+                <span>100 km</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setSelectedCategories([]);
+                  setDistanceRadius(30);
+                }}
+                className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+              >
+                Sıfırla
+              </button>
+              <button
+                onClick={() => {
+                  setShowFilterModal(false);
+                  setSkippedOfferIds([]);
+                  fetchNextOffer();
+                }}
+                className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+              >
+                Uygula
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showCreateOffer && (
