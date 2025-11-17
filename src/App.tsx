@@ -44,10 +44,10 @@ function AppContent() {
   const isAdminRoute = window.location.pathname === '/admin';
   const [currentPage, setCurrentPage] = useState<Page>(isAdminRoute ? 'admin' : 'discover');
 
-  // Debug logging for mobile
+  // Debug logging for mobile (devre dışı)
   useEffect(() => {
-    mobileDebug.log('AppContent state changed', { loading, hasUser: !!user });
-    mobileDebug.showStatus(`Loading: ${loading}, User: ${!!user}`);
+    // mobileDebug.log('AppContent state changed', { loading, hasUser: !!user });
+    // mobileDebug.showStatus(`Loading: ${loading}, User: ${!!user}`);
   }, [loading, user]);
 
   // Scroll to top when page changes
@@ -70,15 +70,11 @@ function AppContent() {
   }, []);
 
   if (loading) {
-    mobileDebug.showStatus('Loading state active');
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Yükleniyor...</p>
-          {mobileDebug.isMobile() && (
-            <p className="text-xs text-gray-500 mt-2">Mobil debug aktif</p>
-          )}
         </div>
       </div>
     );

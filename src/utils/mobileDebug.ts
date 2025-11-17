@@ -19,18 +19,7 @@ export const mobileDebug = {
   isMobile: () => /Mobi|Android/i.test(navigator.userAgent),
   
   showStatus: (status: string) => {
-    if (mobileDebug.isMobile()) {
-      const statusDiv = document.getElementById('mobile-status') || document.createElement('div');
-      statusDiv.id = 'mobile-status';
-      statusDiv.style.cssText = `
-        position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-        background: #000; color: #fff; padding: 10px; font-size: 12px;
-        text-align: center;
-      `;
-      statusDiv.textContent = status;
-      if (!document.getElementById('mobile-status')) {
-        document.body.appendChild(statusDiv);
-      }
-    }
+    // Debug mesajları devre dışı
+    return;
   }
 };

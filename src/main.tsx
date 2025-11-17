@@ -4,9 +4,9 @@ import App from './App.tsx';
 import './index.css';
 import { mobileDebug } from './utils/mobileDebug';
 
-// Mobile debug başlat
-mobileDebug.showStatus('App başlatılıyor...');
-mobileDebug.log('Main.tsx loaded');
+// Mobile debug (devre dışı)
+// mobileDebug.showStatus('App başlatılıyor...');
+// mobileDebug.log('Main.tsx loaded');
 
 // Global error handler for mobile debugging
 window.addEventListener('error', (event) => {
@@ -20,7 +20,7 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 try {
-  mobileDebug.showStatus('React render başlıyor...');
+  // mobileDebug.showStatus('React render başlıyor...');
   const root = createRoot(document.getElementById('root')!);
   
   root.render(
@@ -29,8 +29,8 @@ try {
     </StrictMode>
   );
   
-  mobileDebug.showStatus('React render tamamlandı');
-  mobileDebug.log('React app rendered successfully');
+  // mobileDebug.showStatus('React render tamamlandı');
+  // mobileDebug.log('React app rendered successfully');
 } catch (error) {
   mobileDebug.error('React render failed', error);
   
