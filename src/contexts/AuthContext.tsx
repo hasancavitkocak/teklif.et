@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase, Profile } from '../lib/supabase';
+import { mobileDebug } from '../utils/mobileDebug';
 
 type AuthContextType = {
   user: User | null;
@@ -136,22 +137,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
+        mobileDebug.log('Auth initialization started');
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!isMounted) return;
         
+        mobileDebug.log('Session fetched', { hasSession: !!session });
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          mobileDebug.log('Fetching profile for user');
           const profileData = await fetchProfile(session.user.id);
           if (isMounted) {
             setProfile(profileData);
+            mobileDebug.log('Profile set', { hasProfile: !!profileData });
           }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
+        mobileDebug.error('Auth initialization failed', error);
       } finally {
         if (isMounted) {
+          mobileDebug.log('Auth initialization completed');
           setLoading(false);
         }
       }

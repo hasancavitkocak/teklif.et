@@ -9,6 +9,7 @@ import { useCapacitor } from './hooks/useCapacitor';
 import { usePushNotifications } from './hooks/usePushNotifications';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
+import { mobileDebug } from './utils/mobileDebug';
 
 // Lazy load components for better performance
 const DiscoverOffers = lazy(() => import('./components/DiscoverOffers'));
@@ -19,17 +20,22 @@ const Profile = lazy(() => import('./components/Profile'));
 const FAQ = lazy(() => import('./components/legal/FAQ'));
 const Help = lazy(() => import('./components/legal/Help'));
 const Report = lazy(() => import('./components/legal/Report'));
-const Contact = lazy(() => import('./components/legal/Contact'));
+// Contact component removed
 const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
 const KVKK = lazy(() => import('./components/legal/KVKK'));
 const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
 const AdminApp = lazy(() => import('./admin/AdminApp'));
 
-type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'contact' | 'privacy' | 'terms' | 'kvkk' | 'cookies' | 'admin';
+type Page = 'discover' | 'offers' | 'matches' | 'premium' | 'profile' | 'faq' | 'help' | 'report' | 'privacy' | 'terms' | 'kvkk' | 'cookies' | 'admin';
 
 function AppContent() {
+  mobileDebug.log('AppContent component started');
+  
   const { user, loading } = useAuth();
+  
+  mobileDebug.log('Auth state', { hasUser: !!user, loading });
+  
   useNotifications(); // Initialize real-time notifications
   useCapacitor(); // Initialize Capacitor
   usePushNotifications(); // Initialize push notifications
@@ -40,7 +46,8 @@ function AppContent() {
 
   // Debug logging for mobile
   useEffect(() => {
-    console.log('AppContent - loading:', loading, 'user:', !!user);
+    mobileDebug.log('AppContent state changed', { loading, hasUser: !!user });
+    mobileDebug.showStatus(`Loading: ${loading}, User: ${!!user}`);
   }, [loading, user]);
 
   // Scroll to top when page changes
@@ -63,11 +70,15 @@ function AppContent() {
   }, []);
 
   if (loading) {
+    mobileDebug.showStatus('Loading state active');
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Yükleniyor...</p>
+          {mobileDebug.isMobile() && (
+            <p className="text-xs text-gray-500 mt-2">Mobil debug aktif</p>
+          )}
         </div>
       </div>
     );
@@ -112,7 +123,7 @@ function AppContent() {
         {currentPage === 'faq' && <FAQ />}
         {currentPage === 'help' && <Help />}
         {currentPage === 'report' && <Report />}
-        {currentPage === 'contact' && <Contact />}
+        {/* Contact component removed */}
         {currentPage === 'privacy' && <PrivacyPolicy />}
         {currentPage === 'terms' && <TermsOfService />}
         {currentPage === 'kvkk' && <KVKK />}

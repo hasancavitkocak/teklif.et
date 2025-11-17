@@ -3,6 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Debug for mobile
+if (typeof window !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent)) {
+  console.log('Mobile Supabase config:', { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseAnonKey,
+    url: supabaseUrl?.substring(0, 30) + '...'
+  });
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export type Profile = {
