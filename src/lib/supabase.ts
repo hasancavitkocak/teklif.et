@@ -12,7 +12,17 @@ if (typeof window !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent)) 
   });
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Supabase client - Web ve Native için optimize edilmiş
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Session persistence - hem web hem native'de çalışır
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    // Web'de localStorage, native'de otomatik Capacitor storage kullanılır
+    storageKey: 'teklif-et-auth', // Unique key
+  },
+});
 
 export type Profile = {
   id: string;
