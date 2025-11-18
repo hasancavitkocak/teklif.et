@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, memo } from 'react';
+﻿import { useState, useEffect, memo } from 'react';
 import { Edit2, Save, X, LogOut, HelpCircle, Shield, FileText, Cookie, AlertCircle, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -93,13 +93,13 @@ function Profile({ onNavigate }: ProfileProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto pb-24">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-2xl mx-auto pb-20 px-4">
+      <div className="flex items-center justify-between mb-6 pt-4">
         <h2 className="text-2xl font-bold text-gray-800">Profilim</h2>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-violet-500 text-white rounded-full font-medium hover:bg-violet-600 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium hover:shadow-lg transition-all"
           >
             <Edit2 className="w-4 h-4" />
             Düzenle
@@ -117,9 +117,9 @@ function Profile({ onNavigate }: ProfileProps) {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
         {/* Compact header with profile photo */}
-        <div className="bg-gradient-to-r from-violet-500 to-purple-500 p-6 flex items-center gap-4">
+        <div className="bg-gradient-to-r from-violet-500 to-purple-500 p-8 flex items-center gap-5">
           {(profile.photos && profile.photos.length > 0) ? (
             <img
               src={profile.photos[0]}
@@ -145,7 +145,7 @@ function Profile({ onNavigate }: ProfileProps) {
           </div>
         </div>
 
-        <div className="p-4 md:p-6">
+        <div className="p-6 md:p-8">
           {/* Photo Gallery Section */}
           {isEditing && (
             <div className="mb-8 pb-8 border-b border-gray-200">
@@ -178,17 +178,28 @@ function Profile({ onNavigate }: ProfileProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Şehir
+                  Şehir (Konuma göre otomatik)
                 </label>
-                <select
+                <input
+                  type="text"
                   value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
-                >
-                  {turkishCities.map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  disabled
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500 mt-1">Şehir bilgisi konumunuza göre otomatik belirlenir</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cinsiyet
+                </label>
+                <input
+                  type="text"
+                  value={profile.gender === 'male' ? 'Erkek' : profile.gender === 'female' ? 'Kadın' : 'Belirtilmemiş'}
+                  disabled
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500 mt-1">Cinsiyet bilgisi değiştirilemez</p>
               </div>
 
               <div>
@@ -204,11 +215,11 @@ function Profile({ onNavigate }: ProfileProps) {
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-4 pt-6">
                 <button
                   onClick={handleCancel}
                   disabled={saving}
-                  className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-4 border-2 border-gray-300 rounded-2xl font-semibold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   <X className="w-5 h-5" />
                   İptal
@@ -216,7 +227,7 @@ function Profile({ onNavigate }: ProfileProps) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   <Save className="w-5 h-5" />
                   {saving ? 'Kaydediliyor...' : 'Kaydet'}
@@ -243,6 +254,18 @@ function Profile({ onNavigate }: ProfileProps) {
                   <p className="text-xs text-gray-600 mb-1">Teklif Hakkı</p>
                   <p className="text-base font-semibold text-gray-800">
                     {profile.is_premium ? 'Sınırsız' : `${getFreeOffersLimit(profile.id) - profile.free_offers_used} / ${getFreeOffersLimit(profile.id)}`}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3">
+                  <p className="text-xs text-gray-600 mb-1">Cinsiyet</p>
+                  <p className="text-base font-semibold text-gray-800">
+                    {profile.gender === 'male' ? '👨 Erkek' : profile.gender === 'female' ? '👩 Kadın' : '❓ Belirtilmemiş'}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3">
+                  <p className="text-xs text-gray-600 mb-1">Şehir</p>
+                  <p className="text-base font-semibold text-gray-800">
+                    📍 {profile.city}
                   </p>
                 </div>
               </div>
@@ -272,8 +295,8 @@ function Profile({ onNavigate }: ProfileProps) {
           </div>
 
           {/* Yardım ve Yasal Bölümü */}
-          <div className="mt-4 bg-white rounded-xl shadow overflow-hidden">
-            <h3 className="font-semibold text-gray-800 px-4 pt-4 pb-2 text-sm">Yardım & Destek</h3>
+          <div className="mt-6 bg-white rounded-3xl shadow-xl overflow-hidden">
+            <h3 className="font-semibold text-gray-800 px-6 pt-6 pb-3">Yardım & Destek</h3>
             <div className="divide-y divide-gray-100">
               <button 
                 onClick={() => onNavigate('faq')}
@@ -361,10 +384,10 @@ function Profile({ onNavigate }: ProfileProps) {
           </div>
 
           {/* Çıkış Yap Butonu */}
-          <div className="mt-4">
+          <div className="mt-6">
             <button
               onClick={() => setShowLogoutConfirm(true)}
-              className="w-full py-3 bg-red-500 text-white rounded-xl font-semibold shadow hover:bg-red-600 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
             >
               <LogOut className="w-5 h-5" />
               Çıkış Yap

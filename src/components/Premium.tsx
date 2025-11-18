@@ -170,20 +170,20 @@ export default function Premium() {
 
   if (profile?.is_premium) {
     return (
-      <div className="max-w-md mx-auto pb-24">
-        <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-3xl shadow-2xl p-8 text-white text-center">
-          <Crown className="w-20 h-20 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-2">Premium Üyesiniz!</h2>
-          <p className="text-amber-50 mb-6">
+      <div className="max-w-lg mx-auto pb-24 px-4">
+        <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-6 text-white text-center">
+          <Crown className="w-16 h-16 mx-auto mb-3" />
+          <h2 className="text-2xl font-bold mb-2">Premium Üyesiniz!</h2>
+          <p className="text-sm text-amber-50 mb-4">
             Tüm premium özelliklerin keyfini çıkarın
           </p>
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-6">
-            <h3 className="font-semibold mb-4">Aktif Özellikleriniz</h3>
-            <div className="space-y-3">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+            <h3 className="font-semibold text-sm mb-3">Aktif Özellikleriniz</h3>
+            <div className="space-y-2">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 text-left">
-                  <Check className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-sm">{feature.title}</span>
+                <div key={index} className="flex items-center gap-2 text-left">
+                  <Check className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-xs">{feature.title}</span>
                 </div>
               ))}
             </div>
@@ -191,7 +191,7 @@ export default function Premium() {
           
           <button
             onClick={cancelPremium}
-            className="w-full py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl font-medium transition-all"
+            className="w-full py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-medium transition-all"
           >
             Premium Üyeliği İptal Et
           </button>
@@ -201,41 +201,22 @@ export default function Premium() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto pb-24">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-3xl shadow-2xl p-8 mb-8 overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
-        
-        <div className="relative text-center text-white">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-            <Crown className="w-10 h-10" />
-          </div>
-          <h2 className="text-4xl font-bold mb-3">
-            Premium'a Geçin
-          </h2>
-          <p className="text-lg text-white/90 mb-6">
-            Daha fazla eşleşme ve özel özellikler için
-          </p>
-          <div className="flex items-center justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              <span>Sınırsız Teklif</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              <span>Özel Özellikler</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              <span>Öncelikli Destek</span>
-            </div>
-          </div>
+    <div className="max-w-4xl mx-auto pb-24 px-4 pt-6">
+      {/* Hero Section - Daha Küçük */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mb-3 shadow-lg">
+          <Crown className="w-8 h-8 text-white" />
         </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-1">
+          Premium'a Geçin
+        </h2>
+        <p className="text-sm text-gray-600">
+          Daha fazla eşleşme fırsatı için paket seçin
+        </p>
       </div>
 
-      {/* Pricing Cards */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
+      {/* Pricing Cards - Yan Yana Grid */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
         {(Object.keys(plans) as PackageType[]).map((planKey) => {
           const plan = plans[planKey];
           const isSelected = selectedPlan === planKey;
@@ -244,42 +225,45 @@ export default function Premium() {
             <button
               key={planKey}
               onClick={() => setSelectedPlan(planKey)}
-              className={`relative p-6 rounded-2xl border-2 transition-all text-left ${
+              className={`relative p-4 rounded-xl border-2 transition-all text-center ${
                 isSelected
-                  ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-xl scale-105'
-                  : 'border-gray-200 bg-white hover:border-amber-300 hover:shadow-lg'
+                  ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-lg'
+                  : 'border-gray-200 bg-white hover:border-amber-300'
               } ${plan.popular ? 'ring-2 ring-green-400' : ''}`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                  ⭐ En Popüler
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                  ⭐ Popüler
                 </div>
               )}
-              <div className="text-center">
-                <h3 className="text-lg font-bold text-gray-800 mb-3 mt-2">
+              
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold text-gray-800 leading-tight min-h-[32px] flex items-center justify-center">
                   {plan.name}
                 </h3>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                
+                <div className="py-2">
+                  <div className="text-2xl font-bold text-amber-600">
                     ₺{plan.price}
-                  </span>
-                </div>
-                <div className="space-y-2 mb-4">
-                  <div className="text-base font-semibold text-gray-700">
-                    {plan.offers ? `${plan.offers} Teklif` : '🔥 Sınırsız Teklif'}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs text-gray-500 mt-0.5">
                     {plan.duration}
                   </div>
                 </div>
+                
+                <div className="text-sm font-semibold text-gray-700 min-h-[20px]">
+                  {plan.offers ? `${plan.offers} Teklif` : '🔥 Sınırsız'}
+                </div>
+                
                 {plan.savings && (
-                  <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full inline-block">
+                  <div className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
                     {plan.savings}
                   </div>
                 )}
+                
                 {isSelected && (
-                  <div className="mt-4 flex items-center justify-center gap-2 text-amber-600 font-semibold text-sm">
-                    <Check className="w-4 h-4" />
+                  <div className="flex items-center justify-center gap-1 text-amber-600 font-semibold text-xs pt-1">
+                    <Check className="w-3 h-3" />
                     Seçildi
                   </div>
                 )}
@@ -289,22 +273,23 @@ export default function Premium() {
         })}
       </div>
 
-      {/* Features Grid */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">
-          ✨ Premium Özellikler
+      {/* Features - Grid Layout */}
+      <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+        <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-amber-500" />
+          Premium Özellikler
         </h3>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {features.map((feature, index) => (
-            <div key={index} className="flex gap-3 p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 hover:shadow-md transition-all">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-xl flex items-center justify-center">
-                <feature.icon className="w-6 h-6 text-amber-600" />
+            <div key={index} className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
+              <div className="flex-shrink-0 w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center">
+                <feature.icon className="w-3.5 h-3.5 text-amber-600" />
               </div>
-              <div>
-                <h4 className="font-bold text-gray-800 mb-1">
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-xs text-gray-800 mb-0.5 leading-tight">
                   {feature.title}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-gray-600 leading-snug">
                   {feature.description}
                 </p>
               </div>
@@ -313,18 +298,18 @@ export default function Premium() {
         </div>
       </div>
 
-      {/* CTA Button */}
+      {/* CTA Button - Kompakt */}
       <button
         onClick={handleSubscribe}
         disabled={processing}
-        className="w-full py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-4 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        <Crown className="w-6 h-6" />
+        <Crown className="w-5 h-5" />
         {processing ? 'İşleniyor...' : `₺${plans[selectedPlan].price} - Hemen Başla`}
       </button>
       
-      <p className="text-center text-sm text-gray-500 mt-4">
-        🔒 Güvenli ödeme • 💳 Tüm kartlar kabul edilir • ✅ Anında aktivasyon
+      <p className="text-center text-xs text-gray-500 mt-3 leading-relaxed">
+        🔒 Güvenli ödeme • 💳 Tüm kartlar • ✅ Anında aktif
       </p>
 
       {showPaymentModal && (
